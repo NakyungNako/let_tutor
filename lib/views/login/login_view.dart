@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/widgets/input_text.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -37,32 +38,40 @@ class _LoginViewState extends State<LoginView> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Login'),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextField(
-              controller: _email,
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Enter your email',
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: InputText(iniVal: '', hint: 'Enter your email', label: 'Email', type: 'email', enable: true),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                obscureText: true,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter your password',
+                  labelText: 'Password',
+                ),
               ),
             ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Enter your password',
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/resetpassword');
+                  },
+                  child: const Text('Forgot Password?'),
+                ),
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/resetpassword');
-              },
-              child: const Text('Forgot Password?'),
             ),
             ElevatedButton(
               onPressed: () {
