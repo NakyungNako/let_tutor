@@ -1,21 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/model/course.dart';
 import 'package:let_tutor/views/courses/course_detail/course_detail.dart';
 
 class CourseCard extends StatelessWidget {
-  const CourseCard(
-      {Key? key,
-        required this.imgsrc,
-        required this.title,
-        required this.desc,
-        required this.level,
-        required this.lessons
-      }) : super(key: key);
+  const CourseCard({Key? key, required this.course,}) : super(key: key);
 
-  final String imgsrc;
-  final String title;
-  final String desc;
-  final String level;
-  final int lessons;
+  final Course course;
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +20,7 @@ class CourseCard extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CourseDetail(
-                      imgsrc: imgsrc,
-                      title: title,
-                      desc: desc,
-                      level: level,
-                      lessons: lessons
-                  )
+                  builder: (context) => CourseDetail(course: course)
               )
           );
         },
@@ -44,8 +28,8 @@ class CourseCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.network(
-                imgsrc,
+              child: Image.asset(
+                course.image,
                 width: MediaQuery.of(context).size.width,
               ),
             ),
@@ -55,7 +39,7 @@ class CourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    title,
+                    course.title,
                     style: const TextStyle(
                       fontSize: 23,
                       fontWeight: FontWeight.bold,
@@ -64,7 +48,7 @@ class CourseCard extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(5, 10, 40, 5),
                       child: Text(
-                        desc,
+                        course.about,
                         style: const TextStyle(
                             fontSize: 15,
                             color: Colors.grey
@@ -74,7 +58,7 @@ class CourseCard extends StatelessWidget {
                   Container(
                     alignment: Alignment.bottomLeft,
                       margin: const EdgeInsets.only(left: 5,top: 10),
-                      child: Text('$level · $lessons lessons')),
+                      child: Text('${course.level} · ${course.topics.length} lessons')),
                 ],
               ),
             )

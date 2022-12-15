@@ -1,6 +1,13 @@
+import 'dart:async';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:let_tutor/model/tutor/favorites.dart';
 import 'package:let_tutor/views/tutor/tutor_card.dart';
+
+import '../../data/tutors_sample.dart';
+import '../../model/tutor/tutor.dart';
 
 class TutorPage extends StatefulWidget {
   const TutorPage({Key? key}) : super(key: key);
@@ -12,7 +19,7 @@ class TutorPage extends StatefulWidget {
 class _TutorPageState extends State<TutorPage> {
   final List<String> chips = [
     "All",
-    "English for Kids",
+    "English for kids",
     "English for Business",
     "Conversational",
     "STARTERS",
@@ -25,6 +32,47 @@ class _TutorPageState extends State<TutorPage> {
     "TOEIC"
   ];
 
+  final ScrollController _scrollController = ScrollController();
+  Timer? _debounce;
+
+  List<Tutor> _results = [];
+  List<Tutor> _searchedTutor = [];
+  String specialty = "All";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _results = TutorsSample.tutors;
+    _searchedTutor = TutorsSample.tutors;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _debounce?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<Tutor> results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = TutorsSample.tutors;
+    } else {
+      results = TutorsSample.tutors
+          .where((user) =>
+          user.fullName.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+      // we use the toLowerCase() method to make it case-insensitive
+    }
+    setState(() {
+      _searchedTutor = results;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,6 +80,22 @@ class _TutorPageState extends State<TutorPage> {
         child: Column(
           children: <Widget>[
             TextField(
+              onChanged: (value) {
+                if (_debounce?.isActive ?? false) _debounce?.cancel();
+                _debounce = Timer(const Duration(milliseconds: 1000), () {
+                  _runFilter(value);
+
+                  if(specialty != "All"){
+                    setState(() {
+                      _results = _searchedTutor.where((tutor) => tutor.specialties.contains(specialty)).toList();
+                    });
+                  } else {
+                    setState(() {
+                      _results = _searchedTutor;
+                    });
+                  }
+                });
+              },
               decoration: InputDecoration(
                 hintText: 'Enter tutor name...',
                 enabledBorder: OutlineInputBorder(
@@ -47,12 +111,15 @@ class _TutorPageState extends State<TutorPage> {
               ),
             ),
             const SizedBox(height: 10.0,),
-            DropdownSearch<String>.multiSelection(
+            DropdownSearch<String>(
+              clearButtonProps: const ClearButtonProps(isVisible: true, icon: Icon(Icons.clear, size: 20)),
               items: const ['Foreign','Vietnamese','Native English'],
-              popupProps: const PopupPropsMultiSelection.menu(
+              popupProps: const PopupProps.menu(
                 showSelectedItems: true,
               ),
-              onChanged: print,
+              onChanged: (value) {
+                print(value);
+              },
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(
                   labelText: 'Nationality',
@@ -76,9 +143,34 @@ class _TutorPageState extends State<TutorPage> {
                 scrollDirection: Axis.horizontal,
                 itemCount: chips.length,
                 itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {},
-                    child: Chip(label: Text(chips[index])),
+                  return Container(
+                    margin: const EdgeInsets.only(right: 3),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          specialty = chips[index];
+                        });
+                        if(specialty != "All"){
+                          setState(() {
+                            _results = _searchedTutor.where((tutor) => tutor.specialties.contains(specialty)).toList();
+                          });
+                        } else {
+                          setState(() {
+                            _results = _searchedTutor;
+                          });
+                        }
+                        _scrollController.animateTo(
+                          0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                      },
+                      child: Chip(
+                        label: Text(chips[index]),
+                        labelStyle: specialty == chips[index] ? TextStyle(color: Colors.red[400]) : null,
+                        backgroundColor: specialty == chips[index] ? Colors.red[50] : null,
+                      ),
+                    ),
                   );
                 },
                 shrinkWrap: true,
@@ -86,13 +178,10 @@ class _TutorPageState extends State<TutorPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: 10,
+                controller: _scrollController,
+                itemCount: _results.length,
                 itemBuilder: (context,index) {
-                  return const TutorCard(
-                      name: 'Romelu Lukaku',
-                      avt: 'assets/images/lukaku.jpg',
-                      desc: 'I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.'
-                  );
+                  return TutorCard(tutor: _results[index]);
                 },
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),

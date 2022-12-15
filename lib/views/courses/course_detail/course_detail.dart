@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/model/course.dart';
 
 class CourseDetail extends StatelessWidget {
-  const CourseDetail(
-      {Key? key,
-        required this.imgsrc,
-        required this.title,
-        required this.desc,
-        required this.level,
-        required this.lessons
-      }) : super(key: key);
+  const CourseDetail({Key? key, required this.course,}) : super(key: key);
 
-  final String imgsrc;
-  final String title;
-  final String desc;
-  final String level;
-  final int lessons;
+  final Course course;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +16,12 @@ class CourseDetail extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Image.network(
-                  imgsrc,
+                Image.asset(
+                  course.image,
                   width: MediaQuery.of(context).size.width,
                 ),
                 Positioned(
-                    top: 30,
+                    top: 50,
                     left: 10,
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -55,7 +45,7 @@ class CourseDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    course.title,
                     style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold
@@ -64,7 +54,7 @@ class CourseDetail extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(top: 5,bottom: 5),
                       child: Text(
-                        desc,
+                        course.about,
                         style: const TextStyle(
                             fontSize: 15,
                             color: Colors.grey
@@ -132,11 +122,11 @@ class CourseDetail extends StatelessWidget {
                       )
                     ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 25),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
                     child: Text(
-                        'As climate change and environmentalism become increasingly global issues, this topic appears often in international news and is relevant to many international industries.',
-                      style: TextStyle(
+                      course.overview['Why take this course']!,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w300
                       ),
@@ -159,11 +149,11 @@ class CourseDetail extends StatelessWidget {
                       )
                     ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 25),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
                     child: Text(
-                        'This course covers intermediate level vocabulary related to sustainability and environmental science. In addition, you will complete technical tasks such as describing charts, analyzing data, and making estimations.',
-                      style: TextStyle(
+                      course.overview['What will you be able to do']!,
+                      style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w300
                       ),
@@ -207,7 +197,7 @@ class CourseDetail extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
-                            level,
+                          course.level,
                           style: const TextStyle(
                             fontSize: 18,
                           ),
@@ -253,7 +243,7 @@ class CourseDetail extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
-                            '$lessons topics',
+                            '${course.topics.length} topics',
                           style: const TextStyle(
                             fontSize: 18,
                           ),

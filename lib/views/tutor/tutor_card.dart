@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:let_tutor/model/tutor/favorites.dart';
+import 'package:let_tutor/model/tutor/tutor.dart';
 import 'package:let_tutor/views/tutor/tutor_detail/tutor_detail.dart';
 import 'package:let_tutor/widgets/avatar.dart';
+import 'package:let_tutor/widgets/stars.dart';
 
 class TutorCard extends StatelessWidget {
-  const TutorCard({Key? key, required this.name, required this.avt, required this.desc}) :super(key: key);
+  const TutorCard({Key? key, required this.tutor, }) :super(key: key);
 
-  final String name;
-  final String avt;
-  final String desc;
+  final Tutor tutor;
 
-  static const List<String> chips = [
-    "English for Business",
-    "Conversational",
-    "IELTS",
-    "TOEFL",
-    "TOEIC"
-  ];
 
   @override
   Widget build(BuildContext context) {
+    var favorites = context.watch<Favorites>();
+    var isFavorite = favorites.itemIds.contains(tutor.id);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Card(
@@ -30,8 +28,20 @@ class TutorCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                TutorDetail(name: name, avt: avt, desc: desc, chips: chips,)));
+            Navigator.pushNamed(context, '/tutordetail',
+                arguments: Tutor(
+                    tutor.id,
+                    tutor.fullName,
+                    tutor.country,
+                    tutor.rate,
+                    tutor.intro,
+                    tutor.image,
+                    tutor.languages,
+                    tutor.details,
+                    tutor.specialties,
+                    tutor.dateAvailable
+                )
+            );
           },
           child: Container(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
@@ -47,7 +57,7 @@ class TutorCard extends StatelessWidget {
                       children: [
                         Container(
                             margin: const EdgeInsets.only(right: 15),
-                            child: Avatar(radius: 37, source: avt, name: name)),
+                            child: Avatar(radius: 37, source: tutor.image, name: tutor.fullName)),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -55,7 +65,7 @@ class TutorCard extends StatelessWidget {
                             Container(
                               margin: const EdgeInsets.only(bottom: 5),
                               child: Text(
-                                name,
+                                tutor.fullName,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                             ),
@@ -67,51 +77,34 @@ class TutorCard extends StatelessWidget {
                                   SvgPicture.asset('assets/svg/be.svg', width: 12, height: 12,),
                                   Container(
                                     margin: const EdgeInsets.only(left: 5),
-                                      child: const Text('Belgium'),
+                                      child: Text(tutor.country),
                                   ),
                                 ],
                               ),
                             ),
-                            Row(
-                              children: const [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.yellow,
-                                  size: 18,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.yellow,
-                                  size: 18,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.yellow,
-                                  size: 18,
-                                ),
-                              ],
-                            ),
+                            TutorStars(stars: tutor.rate)
                           ],
                         ),
                       ],
                     ),
                     IconButton(
                         onPressed: () {
-
+                          if(isFavorite){
+                            favorites.remove(tutor);
+                          } else {
+                            favorites.add(tutor);
+                          }
                         },
-                        icon: const Icon(
-                          Icons.favorite,
-                          color: Colors.redAccent,
-                        ))
+                        icon: isFavorite ? const Icon(Icons.favorite, color: Colors.redAccent,) : const Icon(Icons.favorite_border)),
                   ],
                 ),
                 Wrap(
-                  children: List<Widget>.generate(chips.length, (index) => Chip(label: Text(chips[index]))),
+                  children: List<Widget>.generate(tutor.specialties.length, (index) => Chip(label: Text(tutor.specialties[index]))),
                 ),
                 Container(
                     margin: const EdgeInsets.only(top: 10),
                     child: Text(
-                      desc,
+                      tutor.intro,
                       style: const TextStyle(fontSize: 14),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
