@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/model/course.dart';
+import 'package:let_tutor/model/course/course.dart';
 import 'package:let_tutor/views/courses/course_detail/course_detail.dart';
 
 class CourseCard extends StatelessWidget {
@@ -28,8 +28,8 @@ class CourseCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                course.image,
+              child: Image.network(
+                course.imageUrl,
                 width: MediaQuery.of(context).size.width,
               ),
             ),
@@ -39,7 +39,7 @@ class CourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    course.title,
+                    course.name,
                     style: const TextStyle(
                       fontSize: 23,
                       fontWeight: FontWeight.bold,
@@ -48,7 +48,7 @@ class CourseCard extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(5, 10, 40, 5),
                       child: Text(
-                        course.about,
+                        course.description,
                         style: const TextStyle(
                             fontSize: 15,
                             color: Colors.grey

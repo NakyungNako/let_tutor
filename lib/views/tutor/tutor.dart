@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:let_tutor/model/tutor/favorites.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:let_tutor/model/tutor/tutor_search.dart';
 import 'package:let_tutor/views/tutor/tutor_card.dart';
+import 'package:http/http.dart' as http;
 
-import '../../data/tutors_sample.dart';
-import '../../model/tutor/tutor.dart';
+import '../../model/favorite.dart';
+import '../../model/specialties.dart';
 
 class TutorPage extends StatefulWidget {
   const TutorPage({Key? key}) : super(key: key);
@@ -17,33 +20,34 @@ class TutorPage extends StatefulWidget {
 }
 
 class _TutorPageState extends State<TutorPage> {
-  final List<String> chips = [
-    "All",
-    "English for kids",
-    "English for Business",
-    "Conversational",
-    "STARTERS",
-    "MOVERS",
-    "FLYERS",
-    "KET",
-    "PET",
-    "IELTS",
-    "TOEFL",
-    "TOEIC"
-  ];
+  // final List<String> chips = [
+  //   "All",
+  //   "English for kids",
+  //   "English for Business",
+  //   "Conversational",
+  //   "STARTERS",
+  //   "MOVERS",
+  //   "FLYERS",
+  //   "KET",
+  //   "PET",
+  //   "IELTS",
+  //   "TOEFL",
+  //   "TOEIC"
+  // ];
+  static const String url = 'https://sandbox.api.lettutor.com';
 
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
 
-  List<Tutor> _results = [];
-  List<Tutor> _searchedTutor = [];
-  String specialty = "All";
+  List<TutorSearch> _defaultList = [];
+  List<TutorSearch> _results = [];
+  List<TutorSearch> _searchedTutor = [];
+  String specialty = "all";
 
   @override
   void initState() {
     // TODO: implement initState
-    _results = TutorsSample.tutors;
-    _searchedTutor = TutorsSample.tutors;
+    searchTutor();
     super.initState();
   }
 
@@ -55,15 +59,25 @@ class _TutorPageState extends State<TutorPage> {
     super.dispose();
   }
 
+  // Future<void> getPreferences() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final storeAccess = prefs.getString('accessToken') ?? "";
+  //   if(storeAccess != token){
+  //     setState(() {
+  //       token = storeAccess;
+  //     });
+  //   }
+  // }
+
   void _runFilter(String enteredKeyword) {
-    List<Tutor> results = [];
+    List<TutorSearch> results = [];
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      results = TutorsSample.tutors;
+      results = _defaultList;
     } else {
-      results = TutorsSample.tutors
+      results = _defaultList
           .where((user) =>
-          user.fullName.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          user.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -72,9 +86,34 @@ class _TutorPageState extends State<TutorPage> {
     });
   }
 
+  Future<void> searchTutor() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var response = await http.post(
+      Uri.parse("$url/tutor/search"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-type": "application/json",
+      },
+    );
+    if(response.statusCode == 200) {
+      final jsonRes = json.decode(response.body);
+      final List<dynamic> results = jsonRes['rows'];
+      setState(() {
+        _defaultList = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
+        _searchedTutor = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
+        _results = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
+      });
+    } else {
+      final jsonRes = json.decode(response.body);
+      throw Exception(jsonRes["message"]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    const specialtiesList = Specialties.specialList;
+    final specialList = specialtiesList.entries.toList();
     return Container(
         padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
         child: Column(
@@ -85,7 +124,7 @@ class _TutorPageState extends State<TutorPage> {
                 _debounce = Timer(const Duration(milliseconds: 1000), () {
                   _runFilter(value);
 
-                  if(specialty != "All"){
+                  if(specialty != "all"){
                     setState(() {
                       _results = _searchedTutor.where((tutor) => tutor.specialties.contains(specialty)).toList();
                     });
@@ -141,16 +180,16 @@ class _TutorPageState extends State<TutorPage> {
               height: 32,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: chips.length,
+                itemCount: specialList.length,
                 itemBuilder: (context, index) {
                   return Container(
                     margin: const EdgeInsets.only(right: 3),
                     child: InkWell(
                       onTap: () {
                         setState(() {
-                          specialty = chips[index];
+                          specialty = specialList[index].key;
                         });
-                        if(specialty != "All"){
+                        if(specialty != "all"){
                           setState(() {
                             _results = _searchedTutor.where((tutor) => tutor.specialties.contains(specialty)).toList();
                           });
@@ -166,9 +205,9 @@ class _TutorPageState extends State<TutorPage> {
                         );
                       },
                       child: Chip(
-                        label: Text(chips[index]),
-                        labelStyle: specialty == chips[index] ? TextStyle(color: Colors.red[400]) : null,
-                        backgroundColor: specialty == chips[index] ? Colors.red[50] : null,
+                        label: Text(specialList[index].value),
+                        labelStyle: specialty == specialList[index].key ? TextStyle(color: Colors.red[400]) : null,
+                        backgroundColor: specialty == specialList[index].key ? Colors.red[50] : null,
                       ),
                     ),
                   );

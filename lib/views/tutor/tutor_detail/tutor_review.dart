@@ -1,13 +1,62 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:let_tutor/model/tutor/comment.dart';
 
 import 'fivestar_comment.dart';
 
-class TutorReview extends StatelessWidget {
-  const TutorReview({Key? key}) : super(key: key);
+class TutorReview extends StatefulWidget {
+  const TutorReview({Key? key, required this.tutorId}) : super(key: key);
+  final String tutorId;
+
+  static const String url = 'https://sandbox.api.lettutor.com';
+
+  @override
+  State<TutorReview> createState() => _TutorReviewState();
+}
+
+class _TutorReviewState extends State<TutorReview> {
+  List<Comment>? commentList;
+  late int numCom;
+
+  Future<void> getComment() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var response = await http.get(
+      Uri.parse("${TutorReview.url}/feedback/v2/${widget.tutorId}"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-type": "application/json",
+      },
+    );
+    if(response.statusCode == 200){
+      final jsonRes = jsonDecode(response.body);
+      final List<dynamic> results = jsonRes['data']['rows'];
+      setState(() {
+        commentList = results.map((comment) => Comment.fromJson(comment)).toList();
+        numCom = jsonRes['data']['count'];
+      });
+      print(results);
+    } else {
+      final jsonRes = json.decode(response.body);
+      throw Exception(jsonRes["message"]);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getComment();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(15))),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -20,15 +69,18 @@ class TutorReview extends StatelessWidget {
             }, icon: const Icon(Icons.close)),
           ],
         ),
-        const Divider(),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:const [
-            Reviewer(name: 'Mbappe', avt: 'assets/images/mbappe.jpg', cmt: 'Outstanding teacher with creative teaching style'),
-            Reviewer(name: 'Sterling', avt: '', cmt: 'I love this man'),
-            Reviewer(name: 'Kevin', avt: '', cmt: 'Easy to understand, great accent'),
-            Reviewer(name: 'Erling Haaland', avt: 'assets/images/haaland.jpg', cmt: 'gonna study again, 5 stars!!!'),
-          ],
+        const Divider(thickness: 2,),
+        Container(
+          height: 300.0, // Change as per your requirement
+          width: 300.0, // Change as per your requirement
+          child:commentList != null ? ListView.builder(
+            physics: BouncingScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: commentList!.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Reviewer(name: commentList![index].firstInfo.name, avt: commentList![index].firstInfo.avatar, cmt: commentList![index].content);
+            }
+          ) : const Center(child: CircularProgressIndicator()),
         ),
       ],
     );

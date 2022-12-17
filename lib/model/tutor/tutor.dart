@@ -1,51 +1,41 @@
-import 'package:let_tutor/model/tutor/feedback.dart';
-import 'package:let_tutor/model/tutor/schedule.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+import '../user/user.dart';
+
+part 'tutor.g.dart';
+
+@JsonSerializable()
 class Tutor {
-  String id;
-  String fullName;
-  String country;
-  int rate;
-  String intro;
-  String image;
-  List<String> languages;
-  Map<String, String> details;
-  List<String> specialties;
-  List<Schedule> dateAvailable;
-  List<FeedbackRate> feedbacks = [];
+  String video;
+  String bio;
+  String education;
+  String experience;
+  String profession;
+  String targetStudent;
+  String interests;
+  String languages;
+  String specialties;
+  double? rating;
+  User user;
+  bool isFavorite;
+  double avgRating;
+  int totalFeedback;
 
-  Tutor(
-    this.id,
-    this.fullName,
-    this.country,
-    this.rate,
-    this.intro,
-    this.image,
+  Tutor(this.video,
+    this.bio,
+    this.education,
+    this.experience,
+    this.profession,
+    this.targetStudent,
+    this.interests,
     this.languages,
-    this.details,
     this.specialties,
-    this.dateAvailable, [
-    this.feedbacks = const [],
-  ]
-  );
+    this.rating,
+    this.user,
+    this.isFavorite,
+    this.avgRating,
+    this.totalFeedback);
 
-  void setReserved(String id, bool reserved) {
-    for (var i = 0; i < dateAvailable.length; i++) {
-      if (dateAvailable[i].id == id) {
-        dateAvailable[i].isReserved = reserved;
-      }
-    }
-  }
-
-  void addFeedback(FeedbackRate feedback) {
-    feedbacks.add(feedback);
-  }
-
-  int getTotalStar() {
-    int total = 0;
-    for (var i = 0; i < feedbacks.length; i++) {
-      total += feedbacks[i].rating;
-    }
-    return (total / feedbacks.length).round();
-  }
+  factory Tutor.fromJson(Map<String, dynamic> json) => _$TutorFromJson(json);
+  Map<String, dynamic> toJson() => _$TutorToJson(this);
 }

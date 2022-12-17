@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:let_tutor/data/course_sample.dart';
-import 'package:let_tutor/model/course.dart';
+import 'package:let_tutor/model/course/course.dart';
 import 'package:let_tutor/views/courses/course_card.dart';
 
 class Courses extends StatefulWidget {
@@ -20,7 +19,7 @@ class _CoursesState extends State<Courses> {
   @override
   void initState() {
     // TODO: implement initState
-    _results = CoursesSample.courses;
+    // _results = CoursesSample.courses;
     super.initState();
   }
 
@@ -35,12 +34,12 @@ class _CoursesState extends State<Courses> {
     List<Course> results = [];
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      results = CoursesSample.courses;
+      // results = CoursesSample.courses;
     } else {
-      results = CoursesSample.courses
-          .where((course) =>
-          course.title.toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
+      // results = CoursesSample.courses
+      //     .where((course) =>
+      //     course.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
+      //     .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
     setState(() {

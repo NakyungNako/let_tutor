@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:let_tutor/views/configure/account.dart';
 import 'package:let_tutor/views/configure/settings.dart';
 import 'package:let_tutor/views/courses/courses.dart';
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

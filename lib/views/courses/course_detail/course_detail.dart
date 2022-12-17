@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/model/course.dart';
+import 'package:let_tutor/model/course/course.dart';
 
 class CourseDetail extends StatelessWidget {
   const CourseDetail({Key? key, required this.course,}) : super(key: key);
@@ -16,8 +16,8 @@ class CourseDetail extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Image.asset(
-                  course.image,
+                Image.network(
+                  course.imageUrl,
                   width: MediaQuery.of(context).size.width,
                 ),
                 Positioned(
@@ -45,7 +45,7 @@ class CourseDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title,
+                    course.name,
                     style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold
@@ -54,7 +54,7 @@ class CourseDetail extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(top: 5,bottom: 5),
                       child: Text(
-                        course.about,
+                        course.description,
                         style: const TextStyle(
                             fontSize: 15,
                             color: Colors.grey
@@ -125,7 +125,7 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 25),
                     child: Text(
-                      course.overview['Why take this course']!,
+                      course.reason,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w300
@@ -152,7 +152,7 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 25),
                     child: Text(
-                      course.overview['What will you be able to do']!,
+                      course.purpose,
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w300

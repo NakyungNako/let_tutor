@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
@@ -7,16 +8,17 @@ class Avatar extends StatelessWidget {
   final String source;
   final String name;
 
+  static const String avatarURL = "lettutor.com";
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
       backgroundColor: Colors.deepPurple[900],
       foregroundColor: Colors.white,
-      backgroundImage: source != '' ? AssetImage(source) : null,
+      backgroundImage: source.contains(avatarURL) ? NetworkImage(source) : null,
       radius: radius,
       child: Text(
-        source == '' ? name[0].toUpperCase() : '',
+        !source.contains(avatarURL) ? name[0].toUpperCase() : "",
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 20.0,
@@ -25,3 +27,11 @@ class Avatar extends StatelessWidget {
     );
   }
 }
+
+// Text(
+// source == '' ? name[0].toUpperCase() : '',
+// style: const TextStyle(
+// fontWeight: FontWeight.bold,
+// fontSize: 20.0,
+// ),
+// ),
