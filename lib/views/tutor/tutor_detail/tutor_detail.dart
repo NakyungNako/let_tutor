@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:let_tutor/model/schedule/schedule.dart';
+import 'package:let_tutor/model/user/user.dart';
+import 'package:let_tutor/views/tutor/tutor_detail/booking.dart';
 import 'package:let_tutor/views/tutor/tutor_detail/tutor_report.dart';
 import 'package:let_tutor/views/tutor/tutor_detail/tutor_review.dart';
 import 'package:let_tutor/widgets/avatar.dart';
@@ -340,7 +342,7 @@ class _TutorDetailState extends State<TutorDetail> {
                     child: SizedBox(
                       height: 50,
                       child: ListView.builder(
-                        itemCount: _tutor!.user.courses.length,
+                        itemCount: _tutor!.user.courses!.length,
                         itemBuilder: (context, index) {
                           return Column(
                             children: [
@@ -349,7 +351,7 @@ class _TutorDetailState extends State<TutorDetail> {
                                   Container(
                                     margin: const EdgeInsets.only(right: 5),
                                     child: Text(
-                                      '${_tutor!.user.courses[index].name}:',
+                                      '${_tutor!.user.courses![index].name}:',
                                       style: const TextStyle(fontSize: 16,fontWeight: FontWeight.w800),
                                     ),
                                   ),

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:let_tutor/model/course/tutor_course.dart';
+import 'package:let_tutor/model/user/test_preparation.dart';
 
 import 'learn_topics.dart';
 
@@ -17,10 +18,11 @@ class User {
   String? language;
   String? birthday;
   bool? isActivated;
-  List<TutorCourse> courses;
+  List<TutorCourse>? courses;
   String? level;
   List<LearnTopics>? learnTopics;
   String? studySchedule;
+  List<TestPreparation>? testPreparations;
 
   User(this.id,
     this.email,
@@ -35,7 +37,8 @@ class User {
     this.courses,
     this.level,
     this.learnTopics,
-    this.studySchedule
+    this.studySchedule,
+      this.testPreparations,
       );
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

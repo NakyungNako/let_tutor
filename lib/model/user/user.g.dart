@@ -17,14 +17,17 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       json['language'] as String?,
       json['birthday'] as String?,
       json['isActivated'] as bool?,
-      (json['courses'] as List<dynamic>)
-          .map((e) => TutorCourse.fromJson(e as Map<String, dynamic>))
+      (json['courses'] as List<dynamic>?)
+          ?.map((e) => TutorCourse.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['level'] as String?,
       (json['learnTopics'] as List<dynamic>?)
           ?.map((e) => LearnTopics.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['studySchedule'] as String?,
+      (json['testPreparations'] as List<dynamic>?)
+          ?.map((e) => TestPreparation.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -42,4 +45,5 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'level': instance.level,
       'learnTopics': instance.learnTopics,
       'studySchedule': instance.studySchedule,
+      'testPreparations': instance.testPreparations,
     };

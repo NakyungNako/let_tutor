@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:let_tutor/model/course/course.dart';
 import 'package:let_tutor/views/courses/course_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Courses extends StatefulWidget {
   const Courses({Key? key}) : super(key: key);
@@ -13,13 +16,15 @@ class Courses extends StatefulWidget {
 
 class _CoursesState extends State<Courses> {
   Timer? _debounce;
-
+  static const String url = 'https://sandbox.api.lettutor.com';
   List<Course> _results = [];
+  List<Course> _default = [];
 
   @override
   void initState() {
     // TODO: implement initState
     // _results = CoursesSample.courses;
+    getCourses();
     super.initState();
   }
 
@@ -30,16 +35,40 @@ class _CoursesState extends State<Courses> {
     super.dispose();
   }
 
+  Future<void> getCourses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var response = await http.get(
+      Uri.parse("$url/course?page=1&size=100"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-type": "application/json",
+      },
+    );
+
+    if(response.statusCode == 200) {
+      final jsonRes = jsonDecode(response.body);
+      final coLi = jsonRes['data']['rows'] as List;
+      setState(() {
+        _results = coLi.map((e) => Course.fromJson(e)).toList();
+        _default = coLi.map((e) => Course.fromJson(e)).toList();
+      });
+      print(coLi);
+    } else {
+      throw Exception('Cannot get list course');
+    }
+  }
+
   void _runFilter(String enteredKeyword) {
     List<Course> results = [];
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      // results = CoursesSample.courses;
+      results = _default;
     } else {
-      // results = CoursesSample.courses
-      //     .where((course) =>
-      //     course.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
-      //     .toList();
+      results = _default
+          .where((course) =>
+          course.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
     setState(() {

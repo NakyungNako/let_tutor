@@ -9,6 +9,16 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final listLevels = {
+      "0": "Any level",
+      "1": "Beginner",
+      "2": "High Beginner",
+      "3": "Pre-Intermediate",
+      "4": "Intermediate",
+      "5": "Upper-Intermediate",
+      "6": "Advanced",
+      "7": "Proficiency"
+    };
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -58,7 +68,7 @@ class CourseCard extends StatelessWidget {
                   Container(
                     alignment: Alignment.bottomLeft,
                       margin: const EdgeInsets.only(left: 5,top: 10),
-                      child: Text('${course.level} · ${course.topics.length} lessons')),
+                      child: Text('${listLevels[course.level]} · ${course.topics.length} lessons')),
                 ],
               ),
             )

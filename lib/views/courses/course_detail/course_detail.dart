@@ -8,6 +8,16 @@ class CourseDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final listLevels = {
+      "0": "Any level",
+      "1": "Beginner",
+      "2": "High Beginner",
+      "3": "Pre-Intermediate",
+      "4": "Intermediate",
+      "5": "Upper-Intermediate",
+      "6": "Advanced",
+      "7": "Proficiency"
+    };
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -197,7 +207,7 @@ class CourseDetail extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
-                          course.level,
+                          listLevels[course.level]!,
                           style: const TextStyle(
                             fontSize: 18,
                           ),
@@ -251,6 +261,59 @@ class CourseDetail extends StatelessWidget {
                       )
                     ],
                   ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
+                    child: Row(
+                      children: const [
+                        Expanded(
+                            flex: 1,
+                            child: Divider(
+                              color: Colors.black54,
+                            )
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10,right: 10),
+                          child: Text(
+                            'List Topics',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                            flex: 5,
+                            child: Divider(
+                              color: Colors.black54,
+                            )
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListView.builder(
+                    itemCount: course.topics.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index){
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 15,bottom: 15),
+                          child: ElevatedButton(
+                            onPressed: (){},
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(50),
+                              backgroundColor: Colors.white70,
+                              foregroundColor: Colors.black
+                            ),
+                            child: Text(
+                              '${index+1}. ${course.topics[index].name}',
+                              style: const TextStyle(
+                                fontSize: 19,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                  )
                 ],
               ),
             ),

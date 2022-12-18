@@ -13,7 +13,6 @@ class Course {
   String level;
   String reason;
   String purpose;
-  String otherDetails;
   bool visible;
   String createdAt;
   String updatedAt;
@@ -27,7 +26,6 @@ class Course {
     this.level,
     this.reason,
     this.purpose,
-    this.otherDetails,
     this.visible,
     this.createdAt,
     this.updatedAt,

@@ -1,13 +1,57 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:let_tutor/views/schedule/classroom.dart';
 import 'package:let_tutor/views/schedule/history.dart';
 import 'package:let_tutor/views/schedule/schedule_card.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Schedule extends StatelessWidget {
-  const Schedule({Key? key}) : super(key: key);
+import '../../model/schedule/book_info.dart';
 
+class Schedules extends StatefulWidget {
+  const Schedules({Key? key}) : super(key: key);
+
+  @override
+  State<Schedules> createState() => _SchedulesState();
+}
+
+class _SchedulesState extends State<Schedules> {
+  List<BookingInfo> bookInfo = [];
+  static const String url = 'https://sandbox.api.lettutor.com';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getSchedule();
+    super.initState();
+  }
+
+  Future<void> getSchedule() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    final current = DateTime.now().millisecondsSinceEpoch;
+    var response = await http.get(
+      Uri.parse(
+          "$url/booking/list/student?page=1&perPage=40&dateTimeGte=$current&orderBy=meeting&sortBy=asc"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-type": "application/json",
+      },
+    );
+
+    if(response.statusCode == 200) {
+      final jsonRes = jsonDecode(response.body);
+      final bookList = jsonRes['data']['rows'] as List;
+      setState(() {
+        bookInfo = bookList.map((schedule) => BookingInfo.fromJson(schedule)).toList();
+      });
+    } else {
+      throw Exception('Failed to load upcomming lesson');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 10000;
@@ -90,18 +134,13 @@ class Schedule extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: ListView(
+          child: ListView.builder(
             physics: const BouncingScrollPhysics(),
+            itemCount: bookInfo.length,
             shrinkWrap: true,
-            children: <Widget>[
-              Column(
-                children: const [
-                  ScheduleCard(name: 'Ronaldo', avt: ''),
-                  ScheduleCard(name: 'Kante', avt: ''),
-                  ScheduleCard(name: 'Benzema', avt: ''),
-                ],
-              ),
-            ],
+            itemBuilder: (BuildContext context, int index) {
+              return ScheduleCard(bookInfo: bookInfo[index], reloadList: () => getSchedule(),);
+            },
           ),
         )
       ],

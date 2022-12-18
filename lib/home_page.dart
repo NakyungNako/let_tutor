@@ -4,7 +4,7 @@ import 'package:let_tutor/views/configure/account.dart';
 import 'package:let_tutor/views/configure/settings.dart';
 import 'package:let_tutor/views/courses/courses.dart';
 import 'package:let_tutor/views/messages/messages.dart';
-import 'package:let_tutor/views/schedule/schedule.dart';
+import 'package:let_tutor/views/schedule/schedules.dart';
 import 'package:let_tutor/views/tutor/tutor.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List pages = [
     const TutorPage(),
-    const Schedule(),
+    const Schedules(),
     const Courses(),
     const Messages(),
   ];

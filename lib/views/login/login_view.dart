@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:let_tutor/model/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:let_tutor/model/user/user_token.dart';
 
@@ -24,7 +26,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void initState() {
-    getSharedPreferences();
+    // getSharedPreferences();
     super.initState();
   }
 
@@ -58,7 +60,7 @@ class _LoginViewState extends State<LoginView> {
     });
   }
   
-  Future<void> loginPressed() async {
+  Future<void> loginPressed(UserProvider userProvider) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('email', email);
     prefs.setString('password', password);
@@ -74,7 +76,7 @@ class _LoginViewState extends State<LoginView> {
 
     if(response.statusCode == 200) {
       var userToken = UserToken.fromJson(jsonDecode(response.body));
-      prefs.setString('user', jsonEncode(userToken.user));
+      userProvider.setUser(userToken.user);
       prefs.setString('accessToken',userToken.tokens.access.token);
       prefs.setString('refreshToken',userToken.tokens.refresh.token);
       setState(() {
@@ -92,6 +94,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -205,7 +208,7 @@ class _LoginViewState extends State<LoginView> {
                   child: ElevatedButton(
                     onPressed: () {
                       if(_formfield.currentState!.validate()){
-                        loginPressed();
+                        loginPressed(userProvider);
                       }
                     },
                     style: ElevatedButton.styleFrom(

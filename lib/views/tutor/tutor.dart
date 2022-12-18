@@ -9,7 +9,7 @@ import 'package:let_tutor/model/tutor/tutor_search.dart';
 import 'package:let_tutor/views/tutor/tutor_card.dart';
 import 'package:http/http.dart' as http;
 
-import '../../model/favorite.dart';
+import '../../model/user_provider.dart';
 import '../../model/specialties.dart';
 
 class TutorPage extends StatefulWidget {

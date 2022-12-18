@@ -16,10 +16,14 @@ ScheduleDetail _$ScheduleDetailFromJson(Map<String, dynamic> json) =>
       json['endPeriod'] as String,
       json['createdAt'] as String,
       json['updatedAt'] as String,
-      (json['bookingInfo'] as List<dynamic>)
-          .map((e) => BookingInfo.fromJson(e as Map<String, dynamic>))
+      (json['bookingInfo'] as List<dynamic>?)
+          ?.map((e) => BookingInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['isBooked'] as bool,
+      json['isBooked'] ?? false,
+      json['scheduleInfo'] == null
+          ? null
+          : ScheduleTutor.fromJson(
+              json['scheduleInfo'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ScheduleDetailToJson(ScheduleDetail instance) =>
@@ -34,4 +38,5 @@ Map<String, dynamic> _$ScheduleDetailToJson(ScheduleDetail instance) =>
       'updatedAt': instance.updatedAt,
       'bookingInfo': instance.bookingInfo,
       'isBooked': instance.isBooked,
+      'scheduleInfo': instance.scheduleInfo,
     };

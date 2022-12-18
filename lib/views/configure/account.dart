@@ -1,8 +1,23 @@
+import 'dart:convert';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:let_tutor/model/exchange/country_code.dart';
+import 'package:let_tutor/model/exchange/level.dart';
+import 'package:let_tutor/model/exchange/wantolearn.dart';
+import 'package:let_tutor/model/user/learn_topics.dart';
+import 'package:let_tutor/model/user/test_preparation.dart';
 import 'package:let_tutor/widgets/avatar.dart';
 import 'package:let_tutor/widgets/input_text.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:collection/collection.dart';
+
+import '../../model/user/user.dart';
+import '../../model/user_provider.dart';
 
 class Account extends StatefulWidget {
   const Account({Key? key}) : super(key: key);
@@ -12,10 +27,121 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  final TextEditingController _date = TextEditingController();
+  static const String url = 'https://sandbox.api.lettutor.com';
+  final ImagePicker _picker = ImagePicker();
+  TextEditingController? _date;
+  TextEditingController? _nameController;
+  TextEditingController? _emailController;
+  TextEditingController? _phoneController;
+  late DateTime? _birthday;
+  String _name = "";
+  String _levelKey = "";
+  String _country = "";
+  String _level = "";
+  List<LearnTopics> _learnTopics = [];
+  List<TestPreparation> _testPrepare = [];
+  List<String> _whatLearn = [];
+  List<String> _learnTest = [];
+  bool isInit = true;
+
+
+
+  Future<void> getInfo(UserProvider userProvider) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    final response = await http.get(
+      Uri.parse('$url/user/info'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonRes = jsonDecode(response.body);
+      final user = User.fromJson(jsonRes["user"]);
+      userProvider.setUser(user);
+    } else {
+      throw Exception('Cannot get user info');
+    }
+  }
+
+  void _imgFromGallery(UserProvider userProvider) async {
+    final scaffoldMess = ScaffoldMessenger.of(context);
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    if (pickedFile != null) {
+      final request = http.MultipartRequest("POST", Uri.parse('$url/user/uploadAvatar'));
+      request.files.add(await http.MultipartFile.fromPath("avatar", pickedFile.path));
+      request.headers.addAll({"Authorization": 'Bearer $token'});
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        getInfo(userProvider);
+
+        final snackBar = SnackBar(
+          content: const Text('Booking success!'),
+          action: SnackBarAction(
+            onPressed: () {
+              // Some code to undo the change.
+            }, label: 'done',
+          ),
+        );
+
+        // Find the ScaffoldMessenger in the widget tree
+        // and use it to show a SnackBar.
+        scaffoldMess.showSnackBar(snackBar);
+      } else {
+        print("failedx2");
+      }
+    }
+  }
+
+  Future<void> saveUser(String name, String country, String phone, String birthday, String level, List learnTopics, List testPre, UserProvider userProvider) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    final response = await http.put(
+      Uri.parse('$url/user/info'),
+      body: jsonEncode({'name': name, 'country': country, 'phone': phone, 'birthday': birthday, 'level': level, 'learnTopics': learnTopics, 'testPreparations': testPre}),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if(response.statusCode == 200){
+      final jsonRes = jsonDecode(response.body);
+      final user = User.fromJson(jsonRes["user"]);
+      userProvider.setUser(user);
+    } else {
+      throw Exception('Cannot get user info');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
+    setState(() {
+      if(isInit){
+        _name = userProvider.userInfo.name;
+        _levelKey = userProvider.userInfo.level!;
+        _nameController = TextEditingController(text: userProvider.userInfo.name);
+        _emailController = TextEditingController(text: userProvider.userInfo.email);
+        _phoneController = TextEditingController(text: userProvider.userInfo.phone);
+        _date = TextEditingController(text: userProvider.userInfo.birthday);
+        _country = userProvider.userInfo.country;
+        _level = userProvider.userInfo.level ?? "BEGINNER";
+        _learnTopics = userProvider.userInfo.learnTopics ?? [];
+        _testPrepare = userProvider.userInfo.testPreparations ?? [];
+      }
+      isInit = false;
+    });
+    for (var element in _learnTopics) {
+      _whatLearn.add(element.name);
+    }
+    for (var element in _testPrepare) {
+      _whatLearn.add(element.name);
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Settings'),
@@ -28,12 +154,30 @@ class _AccountState extends State<Account> {
           padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
           child: Column(
             children: [
-              const Avatar(radius: 80, source: 'assets/images/greenwood.png', name: 'Greenwood'),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
+              Stack(
+                  children: [
+                    Avatar(radius: 80, source: userProvider.userInfo.avatar, name: userProvider.userInfo.name),
+                    Positioned(
+                      bottom: 10,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: (){
+                          _imgFromGallery(userProvider);
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.grey[300],
+                          radius: 15,
+                          child: const Icon(Icons.camera_alt, color: Colors.grey,),
+                        ),
+                      ),
+                    )
+                  ]
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Mason Greenwood',
-                  style: TextStyle(
+                  userProvider.userInfo.name,
+                  style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w500
                   ),
@@ -42,17 +186,40 @@ class _AccountState extends State<Account> {
               const Divider(
                 color: Colors.black54,
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(8.0),
-                child: InputText(iniVal: 'Mason Greenwood', hint: 'Enter name...', label: 'Full Name',type: 'name',enable: true,),
+                child: TextField(
+                  style: TextStyle(fontSize: 17),
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                    labelText: "Full Name"
+                  ),
+                ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(8.0),
-                child: InputText(iniVal: 'RedMasonG11@gmail.com', hint: 'Enter email...', label: 'Email', type: 'email',enable: false,),
+                child: TextField(
+                  style: const TextStyle(fontSize: 17),
+                  enabled: false,
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      labelText: "Email"
+                  ),
+                ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(8.0),
-                child: InputText(iniVal: '', hint: 'Enter phone number...', label: 'Phone Number', type: 'phone', enable: true,),
+                child: TextField(
+                  style: TextStyle(fontSize: 17),
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      labelText: "Phone Number"
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -60,15 +227,22 @@ class _AccountState extends State<Account> {
                   popupProps: const PopupProps.menu(
                     showSelectedItems: true,
                   ),
-                  items: const ["Brazil", "Italia", "Tunisia", 'Canada', 'United States', 'Viet Nam', 'United Kingdom', 'South Korea', 'Germany', 'China','Thailand','Australia'],
+                  items: countryList,
                   dropdownDecoratorProps: const DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
                       labelText: "Country",
                       hintText: "country in menu mode",
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
-                  selectedItem: "United Kingdom",
+                  selectedItem: countryListWithCode[_country],
+                  onChanged: (value) {
+                    var key = countryListWithCode.keys.firstWhere((k) => countryListWithCode[k] == value);
+                    setState(() {
+                      _country = key;
+                      print(key);
+                    });
+                  },
                 ),
               ),
               Padding(
@@ -76,10 +250,11 @@ class _AccountState extends State<Account> {
                 child: TextFormField(
                   controller: _date,
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     labelText: 'Date of Birth'
                   ),
                   onTap: () async {
+                    // _date.text = userProvider.userInfo.birthday!;
                     FocusScope.of(context).requestFocus(FocusNode());
                     DateTime? pickedDate = await showDatePicker(
                         context: context,
@@ -89,8 +264,10 @@ class _AccountState extends State<Account> {
                     );
                     if(pickedDate != null){
                       setState(() {
-                        _date.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+                        _date!.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                        _birthday = pickedDate;
                       });
+
                     }
                   },
                 ),
@@ -106,10 +283,17 @@ class _AccountState extends State<Account> {
                     dropdownSearchDecoration: InputDecoration(
                       labelText: "My Level",
                       hintText: "level in menu mode",
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
-                  selectedItem: "A1 (Higher Beginner)",
+                  selectedItem: listLevel[_level],
+                  onChanged: (value) {
+                    var key = listLevel.keys.firstWhere((k) => listLevel[k] == value);
+                    setState(() {
+                      _levelKey = key;
+                      print(key);
+                    });
+                  },
                 ),
               ),
               Padding(
@@ -119,8 +303,8 @@ class _AccountState extends State<Account> {
                     showSelectedItems: true,
                   ),
                   items: const ["English for Kids",
-                    "English for Business",
-                    "Conversational",
+                    "Business English",
+                    "Conversational English",
                     "STARTERS",
                     "MOVERS",
                     "FLYERS",
@@ -133,16 +317,36 @@ class _AccountState extends State<Account> {
                     dropdownSearchDecoration: InputDecoration(
                       labelText: "Want to learn",
                       hintText: "level in menu mode",
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
-                  selectedItems: const ['KET','IELTS'],
+                  selectedItems: _whatLearn,
+                  onChanged: (value) {
+                    setState(() {
+                      _learnTest = value;
+                    });
+                  },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: (){
+                    List<String> learnId = [];
+                    List<String> testId = [];
+                    // print(_learnTest);
+                    // var key = listLearningTopics.keys.firstWhereOrNull((k)
+                    // => listLearningTopics[k] == 'STARTERS');
+                    for (var element in _learnTest) {
+                      var key = listLearningTopics.keys.firstWhereOrNull((k) => listLearningTopics[k] == element);
+                      if(key != null){
+                        learnId.add(key);
+                      } else {
+                        key = listPrepare.keys.firstWhereOrNull((k) => listPrepare[k] == element);
+                        if(key!=null) testId.add(key);
+                      }
+                    }
+                    saveUser(_nameController!.text, _country, _phoneController!.text, _date!.text, _levelKey, learnId, testId, userProvider);
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
