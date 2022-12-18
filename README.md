@@ -1,9 +1,10 @@
 # let_tutor_clone
 
 A new Flutter project.
+Milestone 2 & 3: Basic-flow
 
-# Demo mockup-ui
-https://youtu.be/HiKAsB4YALE
+# Demo basic-flow
+https://youtu.be/7vPItI3oJo0
 
 ## Getting Started
 
