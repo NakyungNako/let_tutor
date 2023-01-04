@@ -38,6 +38,7 @@ class _AccountState extends State<Account> {
   String _levelKey = "";
   String _country = "";
   String _level = "";
+  String _defaultDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   List<LearnTopics> _learnTopics = [];
   List<TestPreparation> _testPrepare = [];
   List<String> _whatLearn = [];
@@ -129,19 +130,20 @@ class _AccountState extends State<Account> {
         _emailController = TextEditingController(text: userProvider.userInfo.email);
         _phoneController = TextEditingController(text: userProvider.userInfo.phone);
         _date = TextEditingController(text: userProvider.userInfo.birthday);
+        _defaultDate = userProvider.userInfo.birthday!;
         _country = userProvider.userInfo.country;
         _level = userProvider.userInfo.level ?? "BEGINNER";
         _learnTopics = userProvider.userInfo.learnTopics ?? [];
         _testPrepare = userProvider.userInfo.testPreparations ?? [];
       }
+      for (var element in _learnTopics) {
+        _whatLearn.add(element.name);
+      }
+      for (var element in _testPrepare) {
+        _whatLearn.add(element.name);
+      }
       isInit = false;
     });
-    for (var element in _learnTopics) {
-      _whatLearn.add(element.name);
-    }
-    for (var element in _testPrepare) {
-      _whatLearn.add(element.name);
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Settings'),
@@ -149,6 +151,7 @@ class _AccountState extends State<Account> {
         foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
@@ -258,9 +261,9 @@ class _AccountState extends State<Account> {
                     FocusScope.of(context).requestFocus(FocusNode());
                     DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: DateTime.parse(_defaultDate),
                         firstDate: DateTime(1950),
-                        lastDate: DateTime(2023)
+                        lastDate: DateTime(2024)
                     );
                     if(pickedDate != null){
                       setState(() {
@@ -323,8 +326,9 @@ class _AccountState extends State<Account> {
                   selectedItems: _whatLearn,
                   onChanged: (value) {
                     setState(() {
-                      _learnTest = value;
+                      _learnTest = List.from(value);
                     });
+                    print(_learnTest);
                   },
                 ),
               ),

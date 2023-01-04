@@ -202,7 +202,7 @@ class _TutorDetailState extends State<TutorDetail> {
                 children: [
                   Container(
                       margin: const EdgeInsets.only(right: 15, left: 15),
-                      child: Avatar(radius: 60, source: _tutor!.user.avatar, name: _tutor!.user.name),
+                      child: Avatar(radius: 40, source: _tutor!.user.avatar, name: _tutor!.user.name),
                   ),
                   // child: Avatar(radius: 60, source: _tutor.user.avatar, name: _tutor.user.name)),
                   Column(

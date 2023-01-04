@@ -24,11 +24,11 @@ class _TutorCardState extends State<TutorCard> {
   @override
   void initState() {
     // TODO: implement initState
-    if(widget.tutor.isfavoritetutor == "1"){
-      isFavorite = true;
-    } else {
-      isFavorite = false;
-    }
+    // if(widget.tutor.isfavoritetutor == "1"){
+    //   isFavorite = true;
+    // } else {
+    //   isFavorite = false;
+    // }
     super.initState();
   }
 
@@ -36,6 +36,11 @@ class _TutorCardState extends State<TutorCard> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken') ?? "";
     setState(() {
+      if(widget.tutor.isfavoritetutor == "1"){
+        widget.tutor.isfavoritetutor = "0";
+      } else {
+        widget.tutor.isfavoritetutor = "1";
+      }
       isFavorite = !isFavorite;
     });
     var response = await http.post(
@@ -57,6 +62,13 @@ class _TutorCardState extends State<TutorCard> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      if(widget.tutor.isfavoritetutor == "1"){
+        isFavorite = true;
+      } else {
+        isFavorite = false;
+      }
+    });
     const specialtiesList = Specialties.specialList;
     final specialList = specialtiesList.entries
         .where((element) => widget.tutor.specialties.split(",").contains(element.key))
