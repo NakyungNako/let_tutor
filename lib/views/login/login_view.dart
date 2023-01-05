@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:let_tutor/model/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,12 +17,13 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  late final GoogleSignIn _googleSignIn = GoogleSignIn();
   static const String url = 'https://sandbox.api.lettutor.com';
   final _formfield = GlobalKey<FormState>();
   String email = "";
   String password = "";
-  TextEditingController? _email;
-  TextEditingController? _password;
+  TextEditingController _email = TextEditingController();
+  TextEditingController _password = TextEditingController();
   bool passToggle = true;
   bool isLoading = false;
   bool isWrong = false;
@@ -78,6 +81,10 @@ class _LoginViewState extends State<LoginView> {
     );
 
     if(response.statusCode == 200) {
+      setState(() {
+        _email.clear();
+        _password.clear();
+      });
       var userToken = UserToken.fromJson(jsonDecode(response.body));
       userProvider.setUser(userToken.user);
       prefs.setString('accessToken',userToken.tokens.access.token);
@@ -93,6 +100,41 @@ class _LoginViewState extends State<LoginView> {
         isWrong = true;
       });
       print('failed');
+    }
+  }
+
+  Future<void> signInWithGoogle(UserProvider userProvider) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final String? accessToken = googleAuth?.accessToken;
+
+      if (accessToken != null) {
+        try {
+          final response = await http.post(Uri.parse("$url/auth/google"), body: {'access_token': accessToken});
+          if (response.statusCode == 200) {
+            var userToken = UserToken.fromJson(jsonDecode(response.body));
+            userProvider.setUser(userToken.user);
+            prefs.setString('accessToken',userToken.tokens.access.token);
+            prefs.setString('refreshToken',userToken.tokens.refresh.token);
+            setState(() {
+              isLoading = false;
+            });
+            if(!mounted) return;
+            Navigator.pushNamed(context, '/home');
+          } else {
+            final jsonRes = json.decode(response.body);
+            throw Exception(jsonRes["message"]);
+          }
+        } catch (e) {
+          print(e);
+          // showTopSnackBar(context, CustomSnackBar.error(message: "Login failed! ${e.toString()}"),
+          //     showOutAnimationDuration: const Duration(milliseconds: 1000), displayDuration: const Duration(microseconds: 4000));
+        }
+      }
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -250,6 +292,41 @@ class _LoginViewState extends State<LoginView> {
                         child: const Text('Login'),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                          children: const <Widget>[
+                            Expanded(
+                                child: Divider()
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 10, right: 10),
+                              child: Text("OR"),
+                            ),
+                            Expanded(
+                                child: Divider()
+                            ),
+                          ]
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            if(isWrong == true) isWrong = false;
+                          });
+                          signInWithGoogle(userProvider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        icon: const FaIcon(FontAwesomeIcons.google),
+                        label: const Text('Sign in With Google'),
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -257,6 +334,11 @@ class _LoginViewState extends State<LoginView> {
                         TextButton(
                           child: const Text('Sign up'),
                           onPressed: () {
+                            setState(() {
+                              _email.clear();
+                              _password.clear();
+                              if(isWrong == true) isWrong = false;
+                            });
                             Navigator.pushNamed(context, '/register');
                             },
                         ),

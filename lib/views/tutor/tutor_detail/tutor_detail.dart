@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import 'package:let_tutor/widgets/avatar.dart';
 import 'package:readmore/readmore.dart';
 import 'package:let_tutor/widgets/stars.dart';
 import 'package:http/http.dart' as http;
+import 'package:video_player/video_player.dart';
 
 import '../../../model/course/course.dart';
 import '../../../model/schedule/schedule_detail.dart';
@@ -37,6 +39,7 @@ class _TutorDetailState extends State<TutorDetail> {
   late List<String> specialList;
   List<Schedule>? schedule;
   static const String url = 'https://sandbox.api.lettutor.com';
+  late FlickManager flickManager;
 
   @override
   void initState() {
@@ -59,6 +62,7 @@ class _TutorDetailState extends State<TutorDetail> {
       var tutorDetail = Tutor.fromJson(jsonDecode(response.body));
       setState(() {
         _tutor = tutorDetail;
+        flickManager = FlickManager(videoPlayerController: VideoPlayerController.network(tutorDetail.video));
       });
     } else {
       final jsonDecode = json.decode(response.body);
@@ -197,6 +201,23 @@ class _TutorDetailState extends State<TutorDetail> {
           padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
           child: Column(
             children: [
+              Container(
+                height: 200,
+                margin: const EdgeInsets.only(bottom: 10),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                    child: FlickVideoPlayer(
+                        flickManager: flickManager,
+                      flickVideoWithControls: FlickVideoWithControls(
+                        videoFit: BoxFit.fitHeight,
+                        controls: FlickPortraitControls(
+                          progressBarSettings:
+                          FlickProgressBarSettings(playedColor: Colors.redAccent),
+                        ),
+                      ),
+                    )
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

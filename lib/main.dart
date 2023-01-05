@@ -5,9 +5,12 @@ import 'package:let_tutor/home_page.dart';
 import 'package:let_tutor/views/login/login_view.dart';
 import 'package:let_tutor/views/login/register_view.dart';
 import 'package:let_tutor/views/login/reset_password.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:let_tutor/views/tutor/tutor_detail/tutor_detail.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

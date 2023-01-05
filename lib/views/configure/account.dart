@@ -176,10 +176,12 @@ class _AccountState extends State<Account> {
                     )
                   ]
               ),
-              Padding(
+              Container(
+                alignment: Alignment.center,
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   userProvider.userInfo.name,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w500

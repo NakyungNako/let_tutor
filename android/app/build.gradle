@@ -40,7 +40,8 @@ android {
         applicationId "com.example.let_tutor"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 19
+        multiDexEnabled true
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -60,6 +61,7 @@ flutter {
 }
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
     implementation 'com.google.firebase:firebase-analytics'
 }
