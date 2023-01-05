@@ -9,9 +9,10 @@ import 'package:let_tutor/widgets/stars.dart';
 import 'package:http/http.dart' as http;
 
 class TutorCard extends StatefulWidget {
-  const TutorCard({Key? key, required this.tutor, }) :super(key: key);
+  const TutorCard({Key? key, required this.tutor, required this.updateFavorite, }) :super(key: key);
 
   final TutorSearch tutor;
+  final VoidCallback updateFavorite;
 
   @override
   State<TutorCard> createState() => _TutorCardState();
@@ -55,6 +56,7 @@ class _TutorCardState extends State<TutorCard> {
 
     if (response.statusCode == 200) {
       // print("success: ${response.body}");
+      widget.updateFavorite;
     } else {
       // print("failed: ${response.body}");
     }

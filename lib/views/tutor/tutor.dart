@@ -47,7 +47,11 @@ class _TutorPageState extends State<TutorPage> {
   @override
   void initState() {
     // TODO: implement initState
-    searchTutor();
+    searchTutor().then((value) => setState(() {
+      _defaultList = List.from(value);
+      _results = List.from(_defaultList);
+      _searchedTutor = List.from(_defaultList);
+    }));
     super.initState();
   }
 
@@ -86,7 +90,7 @@ class _TutorPageState extends State<TutorPage> {
     });
   }
 
-  Future<void> searchTutor() async {
+  Future<List<TutorSearch>> searchTutor() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken') ?? "";
     var response = await http.post(
@@ -99,14 +103,19 @@ class _TutorPageState extends State<TutorPage> {
     if(response.statusCode == 200) {
       final jsonRes = json.decode(response.body);
       final List<dynamic> results = jsonRes['rows'];
-      setState(() {
-        _defaultList = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
-        _searchedTutor = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
-        _results = results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
-      });
+      return results.map((tutor) => TutorSearch.fromJson(tutor)).toList();
     } else {
       final jsonRes = json.decode(response.body);
       throw Exception(jsonRes["message"]);
+    }
+  }
+
+  void updateDefaultList(String teacherId) {
+    var isFav = _defaultList[_defaultList.indexWhere((element) => element.userId == teacherId)].isfavoritetutor;
+    if (isFav == "1") {
+      _defaultList[_defaultList.indexWhere((element) => element.userId == teacherId)].isfavoritetutor = "0";
+    } else {
+      _defaultList[_defaultList.indexWhere((element) => element.userId == teacherId)].isfavoritetutor = "1";
     }
   }
 
@@ -220,7 +229,7 @@ class _TutorPageState extends State<TutorPage> {
                 controller: _scrollController,
                 itemCount: _results.length,
                 itemBuilder: (context,index) {
-                  return TutorCard(tutor: _results[index]);
+                  return TutorCard(tutor: _results[index], updateFavorite: () => updateDefaultList(_results[index].userId));
                 },
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
