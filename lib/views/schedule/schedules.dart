@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:intl/intl.dart';
+import 'package:jitsi_meet/feature_flag/feature_flag.dart';
+import 'package:jitsi_meet/jitsi_meet.dart';
 import 'package:let_tutor/views/schedule/classroom.dart';
 import 'package:let_tutor/views/schedule/history.dart';
 import 'package:let_tutor/views/schedule/schedule_card.dart';
@@ -19,6 +22,11 @@ class Schedules extends StatefulWidget {
 }
 
 class _SchedulesState extends State<Schedules> {
+  Duration? total;
+  int? rawTotal;
+  int? endTime;
+  List<String>? timeParts;
+  BookingInfo? upcomingLesson;
   List<BookingInfo> bookInfo = [];
   static const String url = 'https://sandbox.api.lettutor.com';
 
@@ -26,7 +34,59 @@ class _SchedulesState extends State<Schedules> {
   void initState() {
     // TODO: implement initState
     getSchedule();
+    getTotal();
+    getUpcoming();
     super.initState();
+  }
+
+  Future<void> getUpcoming() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    final dateTime = DateTime.now().millisecondsSinceEpoch;
+    final response = await http.get(
+      Uri.parse('$url/booking/next?dateTime=$dateTime'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonRes = json.decode(response.body);
+      final listData = jsonRes["data"] as List;
+      List<BookingInfo> lessons = listData.map((lesson) => BookingInfo.fromJson(lesson)).toList();
+      lessons.sort((a, b) => a.scheduleDetailInfo!.startPeriodTimestamp.compareTo(b.scheduleDetailInfo!.startPeriodTimestamp));
+      lessons = lessons.where((element) => element.scheduleDetailInfo!.startPeriodTimestamp > dateTime).toList();
+      setState(() {
+        if (lessons.isEmpty == false) {
+          upcomingLesson = lessons.first;
+        }
+      });
+    } else {
+      throw Exception(json.decode(response.body)["message"]);
+    }
+  }
+
+  Future<void> getTotal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var response = await http.get(
+      Uri.parse('$url/call/total'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonRes = json.decode(response.body);
+      setState(() {
+        rawTotal = jsonRes['total'];
+        total = Duration(minutes: jsonRes['total']);
+        timeParts = total.toString().split(":");
+      });
+    } else {
+      print('get Total error');
+    }
   }
 
   Future<void> getSchedule() async {
@@ -52,14 +112,27 @@ class _SchedulesState extends State<Schedules> {
       throw Exception('Failed to load upcomming lesson');
     }
   }
+
+  String totalString(List<String> parts) {
+    if(parts[0] != '0') {
+      return '${parts[0]} hours ${parts[1]} minutes';
+    } else {
+      return '${parts[1]} minutes';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 10000;
+    if(upcomingLesson != null){
+      setState((){
+        endTime = upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp;
+      });
+    }
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.only(top: 20),
-          height: 230,
+          padding: const EdgeInsets.only(top: 5),
+          height: 180,
           width: MediaQuery.of(context).size.width,
           color: Colors.red[400],
           child: Column(
@@ -77,33 +150,47 @@ class _SchedulesState extends State<Schedules> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Sun, 23 Oct 22 00:30 - 00:55 ',
-                    style: TextStyle(
+                  upcomingLesson != null ? Text(
+                        "${DateFormat.yMMMEd().format(
+                        DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} "
+                        "${DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} - "
+                        "${DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.endPeriodTimestamp))} ",
+                    style: const TextStyle(
                       fontSize: 15,
                       color: Colors.white,
                     ),
-                  ),
+                  ) : const Text(""),
+                  const Text("(",style: TextStyle(fontSize: 15, color: Colors.greenAccent)),
                   CountdownTimer(
-                    endTime: endTime,
-                    widgetBuilder: (BuildContext context,CurrentRemainingTime? time) {
-                      if (time == null) {
-                        return const Text('Game over');
-                      }
-                      return Text(
-                        '(starts in ${time.hours}:${time.min}:${time.sec})',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.greenAccent,
-                        ),
-                      );
-                    },
+                    endTime: endTime ?? DateTime.now().millisecondsSinceEpoch + 1000 * 30,
+                    textStyle: const TextStyle(fontSize: 15, color: Colors.greenAccent),
                   ),
+                  const Text(")", style: TextStyle(fontSize: 15, color: Colors.greenAccent)),
                 ],
               ),
               ElevatedButton.icon(
-                onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const Classroom()));
+                onPressed: () async {
+                  String? userId = upcomingLesson?.userId;
+                  String? tutorId = upcomingLesson?.scheduleDetailInfo?.scheduleInfo?.tutorId;
+                  String room = '$userId-$tutorId';
+                  String? meetingToken = upcomingLesson?.studentMeetingLink.split('token=')[1];
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>const Classroom()));
+                  try {
+                    FeatureFlag featureFlag = FeatureFlag();
+                    featureFlag.welcomePageEnabled = false;
+                    featureFlag.resolution = FeatureFlagVideoResolution.MD_RESOLUTION; // Limit video resolution to 360p
+
+                    var options = JitsiMeetingOptions(room: room)
+                      ..serverURL = "https://meet.lettutor.com"
+                      ..audioOnly = true
+                      ..audioMuted = true
+                      ..token = meetingToken
+                      ..videoMuted = true;
+
+                    await JitsiMeet.joinMeeting(options);
+                  } catch (error) {
+                    debugPrint("error: $error");
+                  }
                 },
                 icon: const Icon(Icons.play_circle_outline),
                 label: const Text('Enter room now'),
@@ -112,24 +199,24 @@ class _SchedulesState extends State<Schedules> {
                   foregroundColor: Colors.red[400],
                 ),
               ),
-              const Text(
-                'Total lesson time is 156 hours 15 minutes',
-                style: TextStyle(
+              Text(
+                rawTotal != 0 && timeParts != null ? 'Total lesson time is ${totalString(timeParts!)}' : 'Welcome to LetTutor',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const HistoryLesson()));
-                },
-                icon: const Icon(Icons.history),
-                label: const Text('History'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black87,
-                ),
-              ),
+              // ElevatedButton.icon(
+              //   onPressed: (){
+              //     Navigator.push(context, MaterialPageRoute(builder: (context)=>const HistoryLesson()));
+              //   },
+              //   icon: const Icon(Icons.history),
+              //   label: const Text('History'),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.white,
+              //     foregroundColor: Colors.black87,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -139,7 +226,11 @@ class _SchedulesState extends State<Schedules> {
             itemCount: bookInfo.length,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) {
-              return ScheduleCard(bookInfo: bookInfo[index], reloadList: () => getSchedule(),);
+              return ScheduleCard(bookInfo: bookInfo[index], reloadList: () {
+                getSchedule();
+                getTotal();
+                getUpcoming();
+              },);
             },
           ),
         )

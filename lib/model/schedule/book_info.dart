@@ -11,6 +11,7 @@ class BookingInfo {
   bool isDeleted;
   String createdAt;
   String scheduleDetailId;
+  String studentMeetingLink;
   String updatedAt;
   int? cancelReasonId;
   String userId;
@@ -22,6 +23,7 @@ class BookingInfo {
     this.isDeleted,
     this.createdAt,
     this.scheduleDetailId,
+    this.studentMeetingLink,
     this.updatedAt,
     this.cancelReasonId,
     this.userId,

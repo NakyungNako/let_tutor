@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:let_tutor/model/schedule/book_info.dart';
 import 'package:let_tutor/widgets/avatar.dart';
 
-class HistoryCard extends StatelessWidget {
-  const HistoryCard({Key? key, required this.name, required this.avt}) : super(key: key);
+class HistoryCard extends StatefulWidget {
+  const HistoryCard({Key? key, required this.historyInfo}) : super(key: key);
 
-  final String name;
-  final String avt;
+  final BookingInfo historyInfo;
 
+  @override
+  State<HistoryCard> createState() => _HistoryCardState();
+}
+
+class _HistoryCardState extends State<HistoryCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -18,7 +24,7 @@ class HistoryCard extends StatelessWidget {
         children: [
           Container(
               margin: const EdgeInsets.fromLTRB(10, 10, 10, 5),
-              child: const Text('Sun, 23 Oct 22',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
+              child: Text(DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
           ),
           Container(
             margin: const EdgeInsets.all(5),
@@ -27,14 +33,14 @@ class HistoryCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(15),
-                  child: Avatar(radius: 30, source: avt, name: name),
+                  child: Avatar(radius: 30, source: widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.avatar, name: widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                     Container(
@@ -66,7 +72,20 @@ class HistoryCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Lesson Time: 11:00 - 12:00',style: TextStyle(fontSize: 15),),
+                    Row(
+                      children: <Widget>[
+                        const Text('Lesson Time : ',style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),),
+                        Text(
+                          DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                        ),
+                        const Text(" - "),
+                        Text(
+                          DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.endPeriodTimestamp)),
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                        )
+                      ],
+                    ),
                     ElevatedButton(onPressed: (){}, child: const Text('Record'))
                   ],
                 ),
@@ -75,15 +94,11 @@ class HistoryCard extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('No request for lesson'),
-                const Divider(),
-                const Text("Tutor haven't reviewed yet"),
-                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

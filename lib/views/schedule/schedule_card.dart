@@ -5,8 +5,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:let_tutor/model/schedule/book_info.dart';
 import 'package:let_tutor/widgets/avatar.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jitsi_meet/jitsi_meet.dart';
+import 'package:jitsi_meet/feature_flag/feature_flag.dart';
 import 'package:http/http.dart' as http;
+
+import '../../model/user_provider.dart';
 
 class ScheduleCard extends StatefulWidget {
   const ScheduleCard({Key? key, required this.bookInfo, required this.reloadList}) : super(key: key);
@@ -24,6 +29,11 @@ class _ScheduleCardState extends State<ScheduleCard> {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.read<UserProvider>();
+    String userId = widget.bookInfo.userId;
+    String? tutorId = widget.bookInfo.scheduleDetailInfo?.scheduleInfo?.tutorId;
+    String room = '$userId-$tutorId';
+    String meetingToken = widget.bookInfo.studentMeetingLink.split('token=')[1];
     cancelBookedClass(String scheduleDetailIds) async {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken') ?? "";
@@ -53,7 +63,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
           Container(
               margin: const EdgeInsets.fromLTRB(10, 10, 10, 5),
               child: Text(
-                  DateFormat.yMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+                  DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                 style:const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
           ),
           Container(
@@ -71,7 +81,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
                   children: [
                     Text(
                       widget.bookInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                     Container(
                       alignment: Alignment.center,
@@ -99,17 +109,17 @@ class _ScheduleCardState extends State<ScheduleCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text('Lesson Time:',style: TextStyle(fontSize: 18),),
                 Row(
                   children: <Widget>[
+                    const Text('Lesson Time : ',style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
                     Text(
                       DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                     const Text(" - "),
                     Text(
                       DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.endPeriodTimestamp)),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     )
                   ],
                     // ListView.separated(
@@ -178,7 +188,24 @@ class _ScheduleCardState extends State<ScheduleCard> {
               ),
               Container(
                   padding: const EdgeInsets.only(right: 20),
-                  child: ElevatedButton(onPressed: (){}, child: const Text('Go To Meeting'))
+                  child: ElevatedButton(onPressed: () async {
+                    try {
+                      FeatureFlag featureFlag = FeatureFlag();
+                      featureFlag.welcomePageEnabled = false;
+                      featureFlag.resolution = FeatureFlagVideoResolution.MD_RESOLUTION; // Limit video resolution to 360p
+
+                      var options = JitsiMeetingOptions(room: room)
+                        ..serverURL = "https://meet.lettutor.com"
+                        ..audioOnly = true
+                        ..audioMuted = true
+                        ..token = meetingToken
+                        ..videoMuted = true;
+
+                      await JitsiMeet.joinMeeting(options);
+                    } catch (error) {
+                      debugPrint("error: $error");
+                    }
+                  }, child: const Text('Go To Meeting'))
               ),
             ],
           ),

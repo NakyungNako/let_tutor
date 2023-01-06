@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/views/schedule/history.dart';
 import 'package:provider/provider.dart';
 import 'package:let_tutor/views/configure/account.dart';
 import 'package:let_tutor/views/configure/settings.dart';
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   List pages = [
     const TutorPage(),
     const Schedules(),
+    const HistoryLesson(),
     const Courses(),
     const Messages(),
   ];
@@ -33,6 +35,8 @@ class _HomePageState extends State<HomePage> {
       } else if (currentIndex == 1) {
         page = 'Schedule';
       } else if (currentIndex == 2) {
+        page = 'History';
+      } else if (currentIndex == 3) {
         page = 'Discover Courses';
       } else {
         page = 'App';
@@ -112,6 +116,7 @@ class _HomePageState extends State<HomePage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Tutor'),
             BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: 'Schedule'),
+            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
             BottomNavigationBarItem(icon: Icon(Icons.my_library_books), label: 'Courses'),
             BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
           ],
