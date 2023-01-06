@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../../model/schedule/book_info.dart';
+import '../../model/schedule/lesson_report.dart';
 
 class HistoryLesson extends StatefulWidget {
   const HistoryLesson({Key? key}) : super(key: key);
@@ -17,12 +18,37 @@ class HistoryLesson extends StatefulWidget {
 class _HistoryLessonState extends State<HistoryLesson> {
   static const String url = 'https://sandbox.api.lettutor.com';
   List<BookingInfo> historyInfo = [];
+  List<LessonReport> reportReason = [];
 
   @override
   void initState() {
     // TODO: implement initState
     getHistory();
+    getReason();
     super.initState();
+  }
+
+  Future<void> getReason() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? "";
+    var response = await http.get(
+      Uri.parse(
+          "$url/lesson-report/reason"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-type": "application/json",
+      },
+    );
+
+    if(response.statusCode == 200) {
+      final jsonRes = jsonDecode(response.body);
+      final reasonList = jsonRes['rows'] as List;
+      setState(() {
+        reportReason = reasonList.map((reason) => LessonReport.fromJson(reason)).toList();
+      });
+    } else {
+      throw Exception('Failed to load reason');
+    }
   }
 
   Future<void> getHistory() async {
@@ -56,7 +82,7 @@ class _HistoryLessonState extends State<HistoryLesson> {
         itemCount: historyInfo.length,
         shrinkWrap: true,
         itemBuilder: (BuildContext context, int index) {
-          return HistoryCard(historyInfo: historyInfo[index]);
+          return HistoryCard(historyInfo: historyInfo[index], reasons: reportReason,);
         },
     );
   }

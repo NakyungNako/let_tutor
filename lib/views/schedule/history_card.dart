@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:let_tutor/model/schedule/book_info.dart';
+import 'package:let_tutor/model/schedule/lesson_report.dart';
+import 'package:let_tutor/views/schedule/history_report.dart';
 import 'package:let_tutor/widgets/avatar.dart';
 
 class HistoryCard extends StatefulWidget {
-  const HistoryCard({Key? key, required this.historyInfo}) : super(key: key);
+  const HistoryCard({Key? key, required this.historyInfo, required this.reasons}) : super(key: key);
 
   final BookingInfo historyInfo;
+  final List<LessonReport> reasons;
 
   @override
   State<HistoryCard> createState() => _HistoryCardState();
 }
 
 class _HistoryCardState extends State<HistoryCard> {
+
+  Future openReportDialog() => showDialog(
+      context: context,
+      builder: (context) => HistoryReport(historyInfo: widget.historyInfo, reasons: widget.reasons,)
+  );
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -104,7 +113,9 @@ class _HistoryCardState extends State<HistoryCard> {
                   children: [
                     TextButton(onPressed: (){},
                         child: const Text('Add a Rating')),
-                    TextButton(onPressed: (){},
+                    TextButton(onPressed: (){
+                      openReportDialog();
+                    },
                         child: const Text('Report')),
                   ],
                 )
