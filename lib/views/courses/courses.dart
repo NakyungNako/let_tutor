@@ -53,7 +53,6 @@ class _CoursesState extends State<Courses> {
         _results = coLi.map((e) => Course.fromJson(e)).toList();
         _default = coLi.map((e) => Course.fromJson(e)).toList();
       });
-      print(coLi);
     } else {
       throw Exception('Cannot get list course');
     }

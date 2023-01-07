@@ -3,8 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:let_tutor/model/schedule/book_info.dart';
 import 'package:let_tutor/model/schedule/lesson_report.dart';
+import 'package:let_tutor/views/schedule/history_rating.dart';
 import 'package:let_tutor/views/schedule/history_report.dart';
 import 'package:let_tutor/widgets/avatar.dart';
+
+import '../../widgets/stars.dart';
 
 class HistoryCard extends StatefulWidget {
   const HistoryCard({Key? key, required this.historyInfo, required this.reasons}) : super(key: key);
@@ -17,14 +20,25 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
+  double rating = 0;
 
   Future openReportDialog() => showDialog(
       context: context,
       builder: (context) => HistoryReport(historyInfo: widget.historyInfo, reasons: widget.reasons,)
   );
 
+  Future openRatingDialog() => showDialog(
+      context: context,
+      builder: (context) => HistoryRating(historyInfo: widget.historyInfo,)
+  );
+
   @override
   Widget build(BuildContext context) {
+    if(widget.historyInfo.feedbacks.isNotEmpty){
+      setState(() {
+        rating = widget.historyInfo.feedbacks.first.rating.toDouble();
+      });
+    }
     return Card(
       margin: EdgeInsets.all(10),
       color: Colors.grey[300],
@@ -111,8 +125,16 @@ class _HistoryCardState extends State<HistoryCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(onPressed: (){},
-                        child: const Text('Add a Rating')),
+                    rating == 0 ? TextButton(onPressed: (){
+                      openRatingDialog();
+                    },
+                        child: const Text('Add a Rating'))
+                    : Row(
+                      children: [
+                        const Text('Rating: '),
+                        TutorStars(stars: rating.toDouble()),
+                      ],
+                    ),
                     TextButton(onPressed: (){
                       openReportDialog();
                     },

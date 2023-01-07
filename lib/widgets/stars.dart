@@ -17,9 +17,9 @@ class TutorStars extends StatelessWidget {
             size: 18,
           ));
         } else {
-          list.add(const Icon(
-            Icons.star_border,
-            color: Colors.yellow,
+          list.add(Icon(
+            Icons.star,
+            color: Colors.grey[350],
             size: 18,
           ));
         }

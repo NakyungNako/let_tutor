@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:let_tutor/model/course/course.dart';
+import 'package:let_tutor/views/courses/course_detail/pdf_viewer.dart';
 
 class CourseDetail extends StatelessWidget {
   const CourseDetail({Key? key, required this.course,}) : super(key: key);
@@ -71,21 +72,21 @@ class CourseDetail extends StatelessWidget {
                         ),
                       )
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15,bottom: 15),
-                    child: ElevatedButton(
-                      onPressed: (){},
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text(
-                          'Discover',
-                        style: TextStyle(
-                          fontSize: 19,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 15,bottom: 15),
+                  //   child: ElevatedButton(
+                  //     onPressed: (){},
+                  //     style: ElevatedButton.styleFrom(
+                  //       minimumSize: const Size.fromHeight(50),
+                  //     ),
+                  //     child: const Text(
+                  //         'Discover',
+                  //       style: TextStyle(
+                  //         fontSize: 19,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
                     child: Row(
@@ -262,7 +263,7 @@ class CourseDetail extends StatelessWidget {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
+                    padding: const EdgeInsets.fromLTRB(5, 15, 5, 0),
                     child: Row(
                       children: const [
                         Expanded(
@@ -293,21 +294,31 @@ class CourseDetail extends StatelessWidget {
                   ListView.builder(
                     itemCount: course.topics.length,
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index){
                         return Padding(
                           padding: const EdgeInsets.only(top: 15,bottom: 15),
                           child: ElevatedButton(
-                            onPressed: (){},
+                            onPressed: (){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PDFViewer(url: course.topics[index].nameFile, title: course.topics[index].name)
+                                  )
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size.fromHeight(50),
                               backgroundColor: Colors.white70,
                               foregroundColor: Colors.black
                             ),
-                            child: Text(
-                              '${index+1}. ${course.topics[index].name}',
-                              style: const TextStyle(
-                                fontSize: 19,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '${index+1}. ${course.topics[index].name}',
+                                style: const TextStyle(
+                                  fontSize: 19,
+                                ),
                               ),
                             ),
                           ),

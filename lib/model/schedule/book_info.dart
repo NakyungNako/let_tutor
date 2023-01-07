@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:let_tutor/model/schedule/schedule_detail.dart';
 
+import 'feedback.dart';
+
 part 'book_info.g.dart';
 
 @JsonSerializable()
@@ -16,6 +18,7 @@ class BookingInfo {
   int? cancelReasonId;
   String userId;
   ScheduleDetail? scheduleDetailInfo;
+  List<Feedback> feedbacks;
 
   BookingInfo(this.createdAtTimeStamp,
     this.updatedAtTimeStamp,
@@ -27,7 +30,8 @@ class BookingInfo {
     this.updatedAt,
     this.cancelReasonId,
     this.userId,
-      this.scheduleDetailInfo,);
+      this.scheduleDetailInfo,
+      this.feedbacks);
 
   factory BookingInfo.fromJson(Map<String, dynamic> json) => _$BookingInfoFromJson(json);
   Map<String, dynamic> toJson() => _$BookingInfoToJson(this);

@@ -28,6 +28,7 @@ class _SchedulesState extends State<Schedules> {
   List<String>? timeParts;
   BookingInfo? upcomingLesson;
   List<BookingInfo> bookInfo = [];
+  bool isLoading = true;
   static const String url = 'https://sandbox.api.lettutor.com';
 
   @override
@@ -61,6 +62,7 @@ class _SchedulesState extends State<Schedules> {
         if (lessons.isEmpty == false) {
           upcomingLesson = lessons.first;
         }
+        isLoading = false;
       });
     } else {
       throw Exception(json.decode(response.body)["message"]);
@@ -135,22 +137,30 @@ class _SchedulesState extends State<Schedules> {
           height: 180,
           width: MediaQuery.of(context).size.width,
           color: Colors.red[400],
-          child: Column(
+          child: isLoading ? const Center(child: CircularProgressIndicator(),) :
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              upcomingLesson != null ? const Text(
                 'Upcoming Lesson',
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
                 ),
+              ) : const Text(
+                'You have no upcoming lesson',
+                style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
               ),
-              Row(
+              upcomingLesson != null ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  upcomingLesson != null ? Text(
+                  Text(
                         "${DateFormat.yMMMEd().format(
                         DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} "
                         "${DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} - "
@@ -159,7 +169,7 @@ class _SchedulesState extends State<Schedules> {
                       fontSize: 15,
                       color: Colors.white,
                     ),
-                  ) : const Text(""),
+                  ),
                   const Text("(",style: TextStyle(fontSize: 15, color: Colors.greenAccent)),
                   CountdownTimer(
                     endTime: endTime ?? DateTime.now().millisecondsSinceEpoch + 1000 * 30,
@@ -167,8 +177,8 @@ class _SchedulesState extends State<Schedules> {
                   ),
                   const Text(")", style: TextStyle(fontSize: 15, color: Colors.greenAccent)),
                 ],
-              ),
-              ElevatedButton.icon(
+              ) :  Container(),
+              upcomingLesson != null ? ElevatedButton.icon(
                 onPressed: () async {
                   String? userId = upcomingLesson?.userId;
                   String? tutorId = upcomingLesson?.scheduleDetailInfo?.scheduleInfo?.tutorId;
@@ -198,7 +208,7 @@ class _SchedulesState extends State<Schedules> {
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.red[400],
                 ),
-              ),
+              ) : Container(),
               Text(
                 rawTotal != 0 && timeParts != null ? 'Total lesson time is ${totalString(timeParts!)}' : 'Welcome to LetTutor',
                 style: const TextStyle(

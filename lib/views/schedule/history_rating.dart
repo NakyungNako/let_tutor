@@ -1,53 +1,43 @@
 import 'dart:convert';
 
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../model/schedule/book_info.dart';
-import '../../model/schedule/lesson_report.dart';
-import '../../widgets/avatar.dart';
 import 'package:http/http.dart' as http;
 
-class HistoryReport extends StatefulWidget {
-  const HistoryReport({Key? key, required this.historyInfo, required this.reasons}) : super(key: key);
+import '../../model/schedule/book_info.dart';
+import '../../widgets/avatar.dart';
+
+class HistoryRating extends StatefulWidget {
+  const HistoryRating({Key? key, required this.historyInfo}) : super(key: key);
 
   final BookingInfo historyInfo;
-  final List<LessonReport> reasons;
 
   @override
-  State<HistoryReport> createState() => _HistoryReportState();
+  State<HistoryRating> createState() => _HistoryRatingState();
 }
 
-class _HistoryReportState extends State<HistoryReport> {
+class _HistoryRatingState extends State<HistoryRating> {
   static const String url = 'https://sandbox.api.lettutor.com';
   bool isChecked = false;
-  List<String> reasonList = [];
-  late LessonReport reason;
+  int rateValue = 0;
   TextEditingController textarea = TextEditingController();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    reasonList = widget.reasons.map((e) => e.reason).toList();
-    reason = widget.reasons[0];
-    super.initState();
-  }
-
-  Future<void> submitReport(String note, String bookingId, int reasonId) async {
+  Future<void> submitRating(String content, String userId, String bookingId, int rating) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken') ?? "";
-    var response = await http.put(
-      Uri.parse("$url/lesson-report/save-report"),
+    var response = await http.post(
+      Uri.parse("$url/user/feedbackTutor"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-type": "application/json",
       },
       body: jsonEncode({
-        "note": note,
+        "content": content,
         "bookingId": bookingId,
-        "reasonId": reasonId,
+        "userId": userId,
+        "rating": rating,
       }),
     );
 
@@ -99,41 +89,35 @@ class _HistoryReportState extends State<HistoryReport> {
             const Divider(
               color: Colors.black54,
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('What was the reason you reported on the lesson?',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: DropdownSearch<String>(
-                popupProps: const PopupProps.menu(
-                  showSelectedItems: true,
-                ),
-                items: reasonList,
-                // dropdownDecoratorProps: const DropDownDecoratorProps(
-                //   dropdownSearchDecoration: InputDecoration(
-                //     labelText: "My Level",
-                //     hintText: "level in menu mode",
-                //     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                //   ),
-                // ),
-                selectedItem: reasonList[0],
-                onChanged: (value) {
-                  var index = widget.reasons.indexWhere((element) => element.reason == value);
-                  setState(() {
-                    reason = widget.reasons[index];
-                  });
-                },
+              child: Text('What is your rating for ${widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name}?',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)
               ),
             ),
+            RatingBar(
+              initialRating: 3,
+              direction: Axis.horizontal,
+              itemCount: 5,
+              ratingWidget: RatingWidget(
+                full: const Icon(Icons.star, color: Colors.amber,),
+                half: const Icon(Icons.star_half, color: Colors.amber,),
+                empty: Icon(Icons.star, color: Colors.grey[350],),
+              ),
+              itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+              onRatingUpdate: (rating) {
+                setState(() {
+                  rateValue = rating.toInt();
+                });
+              },
+            ),
+            const SizedBox(height: 15,),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: TextField(
                 controller: textarea,
-                keyboardType: TextInputType.multiline,
-                maxLines: 4,
+                keyboardType: TextInputType.text,
+                maxLines: 3,
                 decoration: const InputDecoration(
                     hintText: "Additional Notes",
                     border: OutlineInputBorder(
@@ -150,7 +134,7 @@ class _HistoryReportState extends State<HistoryReport> {
           Navigator.pop(context);
         }, child: const Text('Later',style: TextStyle(color: Colors.black),)),
         TextButton(onPressed: () {
-          submitReport(textarea.text, widget.historyInfo.id, reason.id);
+          submitRating(textarea.text, widget.historyInfo.userId, widget.historyInfo.id, rateValue);
           Navigator.pop(context);
           showDialog<String>(
             context: context,

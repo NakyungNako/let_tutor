@@ -21,6 +21,11 @@ BookingInfo _$BookingInfoFromJson(Map<String, dynamic> json) => BookingInfo(
           ? null
           : ScheduleDetail.fromJson(
               json['scheduleDetailInfo'] as Map<String, dynamic>),
+      json['feedbacks'] == null
+            ? <Feedback>[]
+            : (json['feedbacks'] as List<dynamic>)
+          .map((e) => Feedback.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$BookingInfoToJson(BookingInfo instance) =>
@@ -36,4 +41,5 @@ Map<String, dynamic> _$BookingInfoToJson(BookingInfo instance) =>
       'cancelReasonId': instance.cancelReasonId,
       'userId': instance.userId,
       'scheduleDetailInfo': instance.scheduleDetailInfo,
+      'feedbacks': instance.feedbacks,
     };
