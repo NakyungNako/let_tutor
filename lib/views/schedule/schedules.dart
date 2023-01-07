@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:jitsi_meet/feature_flag/feature_flag.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
@@ -116,15 +117,24 @@ class _SchedulesState extends State<Schedules> {
   }
 
   String totalString(List<String> parts) {
-    if(parts[0] != '0') {
-      return '${parts[0]} hours ${parts[1]} minutes';
+    if(AppLocalizations.of(context)!.timeLocale == "en") {
+      if (parts[0] != '0') {
+        return '${parts[0]} hours ${parts[1]} minutes';
+      } else {
+        return '${parts[1]} minutes';
+      }
     } else {
-      return '${parts[1]} minutes';
+      if (parts[0] != '0') {
+        return '${parts[0]} giờ ${parts[1]} phút';
+      } else {
+        return '${parts[1]} phút';
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     if(upcomingLesson != null){
       setState((){
         endTime = upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp;
@@ -136,22 +146,22 @@ class _SchedulesState extends State<Schedules> {
           padding: const EdgeInsets.only(top: 5),
           height: 180,
           width: MediaQuery.of(context).size.width,
-          color: Colors.red[400],
+          color: isDark ? Colors.black38 : Colors.orangeAccent,
           child: isLoading ? const Center(child: CircularProgressIndicator(),) :
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              upcomingLesson != null ? const Text(
-                'Upcoming Lesson',
-                style: TextStyle(
+              upcomingLesson != null ? Text(
+                AppLocalizations.of(context)!.upcoming,
+                style: const TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
                 ),
-              ) : const Text(
-                'You have no upcoming lesson',
-                style: TextStyle(
+              ) : Text(
+                AppLocalizations.of(context)!.noUpcoming,
+                style: const TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
@@ -161,7 +171,7 @@ class _SchedulesState extends State<Schedules> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                        "${DateFormat.yMMMEd().format(
+                        "${DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(
                         DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} "
                         "${DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.startPeriodTimestamp))} - "
                         "${DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(upcomingLesson!.scheduleDetailInfo!.endPeriodTimestamp))} ",
@@ -178,6 +188,7 @@ class _SchedulesState extends State<Schedules> {
                   const Text(")", style: TextStyle(fontSize: 15, color: Colors.greenAccent)),
                 ],
               ) :  Container(),
+              SizedBox(height: 8,),
               upcomingLesson != null ? ElevatedButton.icon(
                 onPressed: () async {
                   String? userId = upcomingLesson?.userId;
@@ -203,14 +214,15 @@ class _SchedulesState extends State<Schedules> {
                   }
                 },
                 icon: const Icon(Icons.play_circle_outline),
-                label: const Text('Enter room now'),
+                label: Text(AppLocalizations.of(context)!.enterRoom),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: Colors.red[400],
+                  foregroundColor: isDark ? Colors.black : Colors.orangeAccent,
                 ),
               ) : Container(),
+              SizedBox(height: 8,),
               Text(
-                rawTotal != 0 && timeParts != null ? 'Total lesson time is ${totalString(timeParts!)}' : 'Welcome to LetTutor',
+                rawTotal != 0 && timeParts != null ? AppLocalizations.of(context)!.totalTime(totalString(timeParts!)) : AppLocalizations.of(context)!.welcome,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,

@@ -6,6 +6,7 @@ import 'package:let_tutor/model/schedule/lesson_report.dart';
 import 'package:let_tutor/views/schedule/history_rating.dart';
 import 'package:let_tutor/views/schedule/history_report.dart';
 import 'package:let_tutor/widgets/avatar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/stars.dart';
 
@@ -34,24 +35,25 @@ class _HistoryCardState extends State<HistoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     if(widget.historyInfo.feedbacks.isNotEmpty){
       setState(() {
-        rating = widget.historyInfo.feedbacks.first.rating.toDouble();
+        rating = widget.historyInfo.feedbacks.first.rating;
       });
     }
     return Card(
       margin: EdgeInsets.all(10),
-      color: Colors.grey[300],
+      color: isDark ? null : Colors.grey[300],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
               margin: const EdgeInsets.fromLTRB(10, 10, 10, 5),
-              child: Text(DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
+              child: Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
           ),
           Container(
             margin: const EdgeInsets.all(5),
-            color: Colors.white,
+            color: isDark ? Colors.black54 : Colors.white,
             child: Row(
               children: [
                 Padding(
@@ -87,7 +89,7 @@ class _HistoryCardState extends State<HistoryCard> {
           Container(
             margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-            color: Colors.white,
+            color: isDark ? Colors.black54 : Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -97,7 +99,7 @@ class _HistoryCardState extends State<HistoryCard> {
                   children: [
                     Row(
                       children: <Widget>[
-                        const Text('Lesson Time : ',style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),),
+                        Text(AppLocalizations.of(context)!.lessonTime,style:const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),),
                         Text(
                           DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
@@ -109,7 +111,7 @@ class _HistoryCardState extends State<HistoryCard> {
                         )
                       ],
                     ),
-                    ElevatedButton(onPressed: (){}, child: const Text('Record'))
+                    ElevatedButton(onPressed: (){}, child: Text(AppLocalizations.of(context)!.record))
                   ],
                 ),
               ],
@@ -118,7 +120,7 @@ class _HistoryCardState extends State<HistoryCard> {
           Container(
             margin: const EdgeInsets.all(5),
             padding: const EdgeInsets.only(left: 10, right: 10),
-            color: Colors.white,
+            color: isDark ? Colors.black54 : Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -128,17 +130,17 @@ class _HistoryCardState extends State<HistoryCard> {
                     rating == 0 ? TextButton(onPressed: (){
                       openRatingDialog();
                     },
-                        child: const Text('Add a Rating'))
+                        child: Text(AppLocalizations.of(context)!.addRating))
                     : Row(
                       children: [
-                        const Text('Rating: '),
-                        TutorStars(stars: rating.toDouble()),
+                        Text(AppLocalizations.of(context)!.rating),
+                        TutorStars(stars: rating),
                       ],
                     ),
                     TextButton(onPressed: (){
                       openReportDialog();
                     },
-                        child: const Text('Report')),
+                        child: Text(AppLocalizations.of(context)!.report)),
                   ],
                 )
               ],

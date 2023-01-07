@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/schedule/book_info.dart';
 import '../../model/schedule/lesson_report.dart';
 import '../../widgets/avatar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 class HistoryReport extends StatefulWidget {
@@ -61,6 +62,7 @@ class _HistoryReportState extends State<HistoryReport> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return AlertDialog(
       content: SingleChildScrollView(
         child: Column(
@@ -75,12 +77,12 @@ class _HistoryReportState extends State<HistoryReport> {
               style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10,),
-            const Text("Lesson Time", style: TextStyle(fontSize: 14)),
+            Text(AppLocalizations.of(context)!.rateLessonTime, style:const TextStyle(fontSize: 14)),
             const SizedBox(height: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+                Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                   style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
                 ),
                 const Text(", ", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
@@ -99,10 +101,10 @@ class _HistoryReportState extends State<HistoryReport> {
             const Divider(
               color: Colors.black54,
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('What was the reason you reported on the lesson?',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)
+            Padding(
+              padding:const EdgeInsets.all(8.0),
+              child: Text(AppLocalizations.of(context)!.reportQuestion,
+                  style:const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)
               ),
             ),
             Padding(
@@ -134,9 +136,9 @@ class _HistoryReportState extends State<HistoryReport> {
                 controller: textarea,
                 keyboardType: TextInputType.multiline,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                    hintText: "Additional Notes",
-                    border: OutlineInputBorder(
+                decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.addNote,
+                    border: const OutlineInputBorder(
                         borderSide: BorderSide(width: 1)
                     )
                 ),
@@ -148,20 +150,16 @@ class _HistoryReportState extends State<HistoryReport> {
       actions: [
         TextButton(onPressed: (){
           Navigator.pop(context);
-        }, child: const Text('Later',style: TextStyle(color: Colors.black),)),
+        }, child: Text(AppLocalizations.of(context)!.later,style: TextStyle(color: isDark ? Colors.white : Colors.black),)),
         TextButton(onPressed: () {
           submitReport(textarea.text, widget.historyInfo.id, reason.id);
           Navigator.pop(context);
           showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: const Text('Report Successfully!'),
-              content: const Text('Thank you! Your report was sent.', style: TextStyle(fontSize: 19),),
+              title: Text(AppLocalizations.of(context)!.reportSuccess),
+              content: Text(AppLocalizations.of(context)!.thankReport, style: const TextStyle(fontSize: 19),),
               actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel'),
-                ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
                   child: const Text('OK'),
@@ -169,7 +167,7 @@ class _HistoryReportState extends State<HistoryReport> {
               ],
             ),
           );
-        }, child: const Text('Submit'))
+        }, child: Text(AppLocalizations.of(context)!.submit))
       ],
     );
   }

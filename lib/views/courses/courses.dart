@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:let_tutor/model/course/course.dart';
 import 'package:let_tutor/views/courses/course_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 class Courses extends StatefulWidget {
@@ -92,7 +93,7 @@ class _CoursesState extends State<Courses> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Course...',
+                hintText: AppLocalizations.of(context)!.courseSearch,
                 enabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(
                       width: 2, color: Colors.grey),

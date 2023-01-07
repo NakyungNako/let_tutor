@@ -8,6 +8,7 @@ import 'package:let_tutor/model/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:let_tutor/model/user/user_token.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -141,6 +142,8 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
+    TextTheme _textTheme = Theme.of(context).textTheme;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -151,8 +154,8 @@ class _LoginViewState extends State<LoginView> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('LetTutor'),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          // backgroundColor: Colors.white,
+          // foregroundColor: Colors.black,
         ),
         body: Container(
           margin: const EdgeInsets.only(left: 15, right: 15),
@@ -166,11 +169,9 @@ class _LoginViewState extends State<LoginView> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "Say hello to your English tutors",
-                        style: TextStyle(
-                          color: Colors.blueAccent[700],
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
+                        AppLocalizations.of(context)!.helloWorld,
+                        style: _textTheme.headline4?.copyWith(
+                            color:isDark?Colors.white: Colors.blueAccent[700],fontWeight: FontWeight.bold
                         ),
                       ),
                     ),
@@ -187,23 +188,22 @@ class _LoginViewState extends State<LoginView> {
                             height: 10,
                           ),
                           TextFormField(
-                            style: TextStyle(fontSize: 15, color: Colors.grey[900]),
                             controller: _email,
                             keyboardType: TextInputType.emailAddress,
                             onChanged: onEmailChanged,
                             validator: (value) {
                               bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!);
                               if(value.isEmpty){
-                                return "Enter Email!";
+                                return AppLocalizations.of(context)!.enterEmail;
                               }
                               if(!emailValid) {
-                                return "Enter Valid Email";
+                                return AppLocalizations.of(context)!.enterValidEmail;
                               }
                               return null;
                             },
                             decoration: const InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                                hintText: "enter your email: example@mail.com"),
+                              hintText: "enter email"
+                            ),
                           )
                         ],
                       ),
@@ -214,24 +214,22 @@ class _LoginViewState extends State<LoginView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Password:",
+                            AppLocalizations.of(context)!.password,
                             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.grey[800]),
                           ),
                           const SizedBox(
                             height: 10,
                           ),
                           TextFormField(
-                            style: TextStyle(fontSize: 15, color: Colors.grey[900]),
                             controller: _password,
                             obscureText: passToggle,
                             onChanged: onPasswordChanged,
                             validator: (value) {
                               if(value!.isEmpty){
-                                return "Enter Password!";
+                                return AppLocalizations.of(context)!.enterPass;
                               }
                             },
                             decoration: InputDecoration(
-                                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                                 hintText: "enter your pass",
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -256,7 +254,7 @@ class _LoginViewState extends State<LoginView> {
                           onPressed: () {
                             Navigator.pushNamed(context, '/resetpassword');
                           },
-                          child: const Text('Forgot Password?'),
+                          child: Text(AppLocalizations.of(context)!.forgotPassword),
                         ),
                       ),
                     ),
@@ -272,7 +270,7 @@ class _LoginViewState extends State<LoginView> {
                             border: Border.all(color: Colors.redAccent),
                           borderRadius: BorderRadius.circular(3)
                         ),
-                        child: const Text("Incorrect email or password! Please try again"),
+                        child: Text(AppLocalizations.of(context)!.wrongUser),
                       ),
                     ) : Container(),
                     Padding(
@@ -289,21 +287,21 @@ class _LoginViewState extends State<LoginView> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50)
                         ),
-                        child: const Text('Login'),
+                        child: Text(AppLocalizations.of(context)!.login),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
-                          children: const <Widget>[
-                            Expanded(
+                          children: <Widget>[
+                            const Expanded(
                                 child: Divider()
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 10, right: 10),
-                              child: Text("OR"),
+                              padding: const EdgeInsets.only(left: 10, right: 10),
+                              child: Text(AppLocalizations.of(context)!.or),
                             ),
-                            Expanded(
+                            const Expanded(
                                 child: Divider()
                             ),
                           ]
@@ -324,15 +322,15 @@ class _LoginViewState extends State<LoginView> {
                           minimumSize: const Size.fromHeight(50),
                         ),
                         icon: const FaIcon(FontAwesomeIcons.google),
-                        label: const Text('Sign in With Google'),
+                        label: Text(AppLocalizations.of(context)!.googleSignIn),
                       ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Not a member yet?'),
+                        Text(AppLocalizations.of(context)!.notMember),
                         TextButton(
-                          child: const Text('Sign up'),
+                          child: Text(AppLocalizations.of(context)!.signUp),
                           onPressed: () {
                             setState(() {
                               _email.clear();

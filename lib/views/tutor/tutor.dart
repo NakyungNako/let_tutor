@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:let_tutor/model/tutor/tutor_search.dart';
 import 'package:let_tutor/views/tutor/tutor_card.dart';
@@ -121,8 +122,11 @@ class _TutorPageState extends State<TutorPage> {
 
   @override
   Widget build(BuildContext context) {
-    const specialtiesList = Specialties.specialList;
-    final specialList = specialtiesList.entries.toList();
+    var specialtiesList = {...Specialties.specialList};
+    specialtiesList.update("english-for-kids", (value) => AppLocalizations.of(context)!.englishKids);
+    specialtiesList.update("business-english", (value) => AppLocalizations.of(context)!.englishBusiness);
+    specialtiesList.update("conversational-english", (value) => AppLocalizations.of(context)!.englishConversation);
+    List<MapEntry<String, String>> specialList = specialtiesList.entries.toList();
     return Container(
         padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
         child: Column(
@@ -145,17 +149,17 @@ class _TutorPageState extends State<TutorPage> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Enter tutor name...',
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      width: 2, color: Colors.grey),
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      width: 2, color: Colors.blueAccent),
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
+                hintText: AppLocalizations.of(context)!.enterTutor,
+                // enabledBorder: OutlineInputBorder(
+                //   borderSide: const BorderSide(
+                //       width: 2, color: Colors.grey),
+                //   borderRadius: BorderRadius.circular(50.0),
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderSide: const BorderSide(
+                //       width: 2, color: Colors.blueAccent),
+                //   borderRadius: BorderRadius.circular(50.0),
+                // ),
               ),
             ),
             const SizedBox(height: 10.0,),
@@ -170,17 +174,17 @@ class _TutorPageState extends State<TutorPage> {
               },
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(
-                  labelText: 'Nationality',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        width: 1, color: Colors.grey),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        width: 1, color: Colors.blueAccent),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
+                  labelText: AppLocalizations.of(context)!.nationality,
+                  // enabledBorder: OutlineInputBorder(
+                  //   borderSide: const BorderSide(
+                  //       width: 1, color: Colors.grey),
+                  //   borderRadius: BorderRadius.circular(20.0),
+                  // ),
+                  // focusedBorder: OutlineInputBorder(
+                  //   borderSide: const BorderSide(
+                  //       width: 1, color: Colors.blueAccent),
+                  //   borderRadius: BorderRadius.circular(20.0),
+                  // ),
                 ),
               ),
             ),
@@ -215,8 +219,9 @@ class _TutorPageState extends State<TutorPage> {
                       },
                       child: Chip(
                         label: Text(specialList[index].value),
-                        labelStyle: specialty == specialList[index].key ? TextStyle(color: Colors.red[400]) : null,
-                        backgroundColor: specialty == specialList[index].key ? Colors.red[50] : null,
+                        labelStyle: specialty == specialList[index].key ? TextStyle(color: Colors.orange[400]) : null,
+                        backgroundColor: specialty == specialList[index].key ? Colors.orange[50] : null,
+
                       ),
                     ),
                   );

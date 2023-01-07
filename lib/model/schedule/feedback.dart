@@ -8,7 +8,7 @@ class Feedback {
   String bookingId;
   String firstId;
   String secondId;
-  int rating;
+  double rating;
 
   Feedback(this.id,
     this.bookingId,

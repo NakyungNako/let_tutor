@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,6 +17,7 @@ import 'package:readmore/readmore.dart';
 import 'package:let_tutor/widgets/stars.dart';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../model/course/course.dart';
 import '../../../model/schedule/schedule_detail.dart';
@@ -172,7 +174,10 @@ class _TutorDetailState extends State<TutorDetail> {
   Widget build(BuildContext context) {
     // final tutorId = ModalRoute.of(context)!.settings.arguments as String;
     if(_tutor != null) {
-      const specialtiesList = Specialties.specialList;
+      var specialtiesList = {...Specialties.specialList};
+      specialtiesList.update("english-for-kids", (value) => AppLocalizations.of(context)!.englishKids);
+      specialtiesList.update("business-english", (value) => AppLocalizations.of(context)!.englishBusiness);
+      specialtiesList.update("conversational-english", (value) => AppLocalizations.of(context)!.englishConversation);
       setState(() {
         specialList = specialtiesList.entries
             .where((element) => _tutor!.specialties.split(",").contains(element.key))
@@ -192,9 +197,7 @@ class _TutorDetailState extends State<TutorDetail> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        title: const Text('Profile'),
+        title: Text(AppLocalizations.of(context)!.tutorProfile),
       ),
       body:_tutor != null ? SingleChildScrollView(
         child: Padding(
@@ -261,10 +264,10 @@ class _TutorDetailState extends State<TutorDetail> {
                   _tutor!.bio,
                   trimLines: 2,
                   trimMode: TrimMode.Line,
-                  trimCollapsedText: 'more',
-                  trimExpandedText: 'less',
-                  moreStyle: const TextStyle(fontSize: 15, color: Colors.lightBlue),
-                  lessStyle: const TextStyle(fontSize: 15, color: Colors.lightBlue),
+                  trimCollapsedText: AppLocalizations.of(context)!.more,
+                  trimExpandedText: AppLocalizations.of(context)!.less,
+                  moreStyle: const TextStyle(fontSize: 15, color: Colors.orange),
+                  lessStyle: const TextStyle(fontSize: 15, color: Colors.orange),
                   style: const TextStyle(fontSize: 15),
                 ),
               ),
@@ -277,7 +280,7 @@ class _TutorDetailState extends State<TutorDetail> {
                           onPressed: onPressedFavorite,
                           icon: _tutor!.isFavorite ? const Icon(Icons.favorite, color: Colors.redAccent,) : const Icon(Icons.favorite_border),
                       ),
-                      const Text('favorite'),
+                      Text(AppLocalizations.of(context)!.favorite),
                     ],
                   ),
                   Column(
@@ -287,7 +290,7 @@ class _TutorDetailState extends State<TutorDetail> {
                             openReportDialog();
                           },
                           icon: const Icon(Icons.info_outline)),
-                      const Text('report'),
+                      Text(AppLocalizations.of(context)!.report),
                     ],
                   ),
                   Column(
@@ -297,7 +300,7 @@ class _TutorDetailState extends State<TutorDetail> {
                             openReviewDialog();
                           },
                           icon: const Icon(Icons.star_border)),
-                      const Text('reviews'),
+                      Text(AppLocalizations.of(context)!.reviews),
                     ],
                   ),
                 ],
@@ -305,9 +308,9 @@ class _TutorDetailState extends State<TutorDetail> {
               Container(
                 alignment: Alignment.centerLeft,
                 margin: const EdgeInsets.all(13),
-                child: const Text(
-                    'Specialties',
-                    style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.specialties,
+                    style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                 ),
               ),
               Wrap(
@@ -319,9 +322,9 @@ class _TutorDetailState extends State<TutorDetail> {
               Container(
                 alignment: Alignment.centerLeft,
                 margin: const EdgeInsets.all(13),
-                child: const Text(
-                  'Interests',
-                  style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.interests,
+                  style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                 ),
               ),
               Container(
@@ -335,9 +338,9 @@ class _TutorDetailState extends State<TutorDetail> {
               Container(
                 alignment: Alignment.centerLeft,
                 margin: const EdgeInsets.all(13),
-                child: const Text(
-                  'Teaching experience',
-                  style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.teachExp,
+                  style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                 ),
               ),
               Container(
@@ -348,14 +351,14 @@ class _TutorDetailState extends State<TutorDetail> {
                   style: const TextStyle(fontSize: 15),
                 ),
               ),
-              Column(
+              _tutor!.user.courses!.isNotEmpty ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     margin: const EdgeInsets.all(13),
-                    child: const Text(
-                      "Courses",
-                      style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                    child: Text(
+                      AppLocalizations.of(context)!.courseProfile,
+                      style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                     ),
                   ),
                   Container(
@@ -382,7 +385,7 @@ class _TutorDetailState extends State<TutorDetail> {
                                       },
                                     child: const Text(
                                         'Link',
-                                        style: TextStyle(fontSize: 16, color: Colors.lightBlue)
+                                        style: TextStyle(fontSize: 16, color: Colors.orange)
                                     ),
                                   )
                                 ],
@@ -395,7 +398,7 @@ class _TutorDetailState extends State<TutorDetail> {
                     ),
                   ),
                 ],
-              ),
+              ) : Container(),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -414,7 +417,6 @@ class _TutorDetailState extends State<TutorDetail> {
                           builder: (BuildContext context) {
                             return LayoutBuilder(
                               builder: (BuildContext context, BoxConstraints constraints) => Container(
-                                color: Colors.white,
                                 height: MediaQuery.of(context).size.height * 0.4,
                                 constraints: const BoxConstraints(maxWidth: 1000),
                                 child: Column(
@@ -425,8 +427,8 @@ class _TutorDetailState extends State<TutorDetail> {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: const <Widget>[
-                                            Text("Pick Date", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                          children: <Widget>[
+                                            Text(AppLocalizations.of(context)!.pickDate, style:const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                           ],
                                         )),
                                     Expanded(
@@ -471,11 +473,10 @@ class _TutorDetailState extends State<TutorDetail> {
                         height: 24,
                         padding: const EdgeInsets.all(2.0),
                         child: const CircularProgressIndicator(
-                          color: Colors.white,
                           strokeWidth: 3,
                       ),)
                     : const Icon(Icons.saved_search),
-                    label: const Text('Start Booking'),
+                    label: Text(AppLocalizations.of(context)!.booking),
                   ),
                 ),
               )
@@ -502,7 +503,6 @@ class _TutorDetailState extends State<TutorDetail> {
         return SafeArea(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) => Container(
-              color: Colors.white,
               height: MediaQuery.of(context).size.height * 0.5,
               child: Column(
                 children: [
@@ -512,10 +512,10 @@ class _TutorDetailState extends State<TutorDetail> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children:const <Widget>[
+                        children:<Widget>[
                           Text(
-                            "Pick your class",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            AppLocalizations.of(context)!.pickClass,
+                            style:const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       )),
@@ -537,6 +537,7 @@ class _TutorDetailState extends State<TutorDetail> {
                                 : () async {
                               final navigator = Navigator.of(context);
                               final scaffoldMess = ScaffoldMessenger.of(context);
+                              final appLocale = AppLocalizations.of(context);
                               if (!scheduleDetails[index].isBooked &&
                                   DateTime.fromMillisecondsSinceEpoch(scheduleDetails[index].startPeriodTimestamp).isAfter(DateTime.now())) {
                                 try {
@@ -547,11 +548,13 @@ class _TutorDetailState extends State<TutorDetail> {
                                     navigator.pop();
 
                                     final snackBar = SnackBar(
-                                      content: const Text('Booking success!'),
-                                      action: SnackBarAction(
-                                        onPressed: () {
-                                          // Some code to undo the change.
-                                        }, label: 'done',
+                                      elevation: 0,
+                                      backgroundColor: Colors.transparent,
+                                      behavior: SnackBarBehavior.floating,
+                                      content: AwesomeSnackbarContent(
+                                        title: appLocale!.bookSuccess,
+                                        message: appLocale.bookSuccess,
+                                        contentType: ContentType.success,
                                       ),
                                     );
 
@@ -561,11 +564,14 @@ class _TutorDetailState extends State<TutorDetail> {
                                   }
                                 } catch (e) {
                                   final snackBar = SnackBar(
-                                    content: const Text('Booking failed!'),
-                                    action: SnackBarAction(
-                                      onPressed: () {
-                                        // Some code to undo the change.
-                                      }, label: 'done',
+                                    elevation: 0,
+                                    backgroundColor: Colors.transparent,
+                                    behavior: SnackBarBehavior.floating,
+                                    content: AwesomeSnackbarContent(
+                                      title: appLocale!.bookFail,
+                                      message: appLocale.bookFail,
+                                      contentType: ContentType.failure,
+                                      inMaterialBanner: true,
                                     ),
                                   );
                                   scaffoldMess.showSnackBar(snackBar);

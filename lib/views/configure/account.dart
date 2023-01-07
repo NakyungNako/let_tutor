@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../model/user/user.dart';
 import '../../model/user_provider.dart';
@@ -100,6 +102,8 @@ class _AccountState extends State<Account> {
   }
 
   Future<void> saveUser(String name, String country, String phone, String birthday, String level, List learnTopics, List testPre, UserProvider userProvider) async {
+    final scaffoldMess = ScaffoldMessenger.of(context);
+    final appLocale = AppLocalizations.of(context);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken') ?? "";
     final response = await http.put(
@@ -114,7 +118,32 @@ class _AccountState extends State<Account> {
       final jsonRes = jsonDecode(response.body);
       final user = User.fromJson(jsonRes["user"]);
       userProvider.setUser(user);
+      final snackBar = SnackBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        content: AwesomeSnackbarContent(
+          title: appLocale!.saveSuccess,
+          message: appLocale.saveSuccess,
+          contentType: ContentType.success,
+        ),
+      );
+
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      scaffoldMess.showSnackBar(snackBar);
     } else {
+      final snackBar = SnackBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        content: AwesomeSnackbarContent(
+          title: appLocale!.saveFail,
+          message: appLocale.saveFail,
+          contentType: ContentType.failure,
+        ),
+      );
+      scaffoldMess.showSnackBar(snackBar);
       throw Exception('Cannot get user info');
     }
   }
@@ -138,17 +167,17 @@ class _AccountState extends State<Account> {
       }
       for (var element in _learnTopics) {
         _whatLearn.add(element.name);
+        _learnTest.add(element.name);
       }
       for (var element in _testPrepare) {
         _whatLearn.add(element.name);
+        _learnTest.add(element.name);
       }
       isInit = false;
     });
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Settings'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text(AppLocalizations.of(context)!.accountSetting),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -196,9 +225,9 @@ class _AccountState extends State<Account> {
                 child: TextField(
                   style: TextStyle(fontSize: 17),
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                    labelText: "Full Name"
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                    labelText: AppLocalizations.of(context)!.fullName
                   ),
                 ),
               ),
@@ -220,9 +249,9 @@ class _AccountState extends State<Account> {
                   style: TextStyle(fontSize: 17),
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                      labelText: "Phone Number"
+                  decoration: InputDecoration(
+                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      labelText: AppLocalizations.of(context)!.phone
                   ),
                 ),
               ),
@@ -233,11 +262,11 @@ class _AccountState extends State<Account> {
                     showSelectedItems: true,
                   ),
                   items: countryList,
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownDecoratorProps: DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
-                      labelText: "Country",
+                      labelText: AppLocalizations.of(context)!.country,
                       hintText: "country in menu mode",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
                   selectedItem: countryListWithCode[_country],
@@ -254,9 +283,9 @@ class _AccountState extends State<Account> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   controller: _date,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                    labelText: 'Date of Birth'
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                    labelText: AppLocalizations.of(context)!.birthday
                   ),
                   onTap: () async {
                     // _date.text = userProvider.userInfo.birthday!;
@@ -284,11 +313,11 @@ class _AccountState extends State<Account> {
                     showSelectedItems: true,
                   ),
                   items: const ['Pre A1 (Beginner)','A1 (Higher Beginner)','A2 (Pre-Intermediate)','B1 (Intermediate)','B2 (Upper-Intermediate)','C1 (Advanced)','C2 (Proficiency)'],
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownDecoratorProps: DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
-                      labelText: "My Level",
+                      labelText: AppLocalizations.of(context)!.myLevel,
                       hintText: "level in menu mode",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
                   selectedItem: listLevel[_level],
@@ -318,11 +347,11 @@ class _AccountState extends State<Account> {
                     "IELTS",
                     "TOEFL",
                     "TOEIC"],
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownDecoratorProps: DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
-                      labelText: "Want to learn",
+                      labelText: AppLocalizations.of(context)!.learn,
                       hintText: "level in menu mode",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
                   selectedItems: _whatLearn,
@@ -353,14 +382,13 @@ class _AccountState extends State<Account> {
                       }
                     }
                     saveUser(_nameController!.text, _country, _phoneController!.text, _date!.text, _levelKey, learnId, testId, userProvider);
-                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                   ),
-                  child: const Text(
-                    'Save changes',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.save,
+                    style: const TextStyle(
                       fontSize: 19,
                     ),
                   ),

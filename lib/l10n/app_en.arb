@@ -1,0 +1,139 @@
+{
+    "helloWorld": "Say hello to your English tutors",
+    "@helloWorld": {
+      "description": "The conventional newborn programmer greeting"
+    },
+    "forgotPassword": "Forgot Password?",
+    "login": "Login",
+    "or": "OR",
+    "googleSignIn": "Sign in With Google",
+    "notMember": "Not a member yet?",
+    "signUp": "Sign Up",
+    "register": "Register",
+    "wrongUser": "Incorrect email or password! Please try again",
+    "alreadyMember": "Already have an account?",
+    "backToLogin": "Sign in",
+    "registerSuccess": "Check your email for verification",
+    "registerFail": "Something wrong! Please try again",
+    "resetTitle": "Password Reset",
+    "resetPass": "Reset Password",
+    "resetQuote": "Please enter your email address to reset your account.",
+    "resetSend": "Send Reset Link",
+
+    "password": "Password:",
+    "rePassword": "Re-enter Password:",
+    "enterEmail": "Enter Email",
+    "enterValidEmail": "Enter Valid Email",
+    "enterPass": "Enter Password",
+    "shortPass": "Password Length must be 8 or more",
+    "matchPass": "Password mismatch",
+
+    "profile": "Profile",
+    "settings": "Settings",
+    "logOut": "Log Out",
+
+    "tutor": "Tutor",
+    "schedule": "Schedule",
+    "history": "History",
+    "courses": "Courses",
+    "findTutor": "Find a Tutor",
+    "discover": "Discover Courses",
+    "tutorProfile": "Tutor Profile",
+
+    "englishKids": "English for Kids",
+    "englishBusiness": "English for Business",
+    "englishConversation": "Conversational English",
+    "enterTutor": "Enter tutor name...",
+    "nationality": "Nationality",
+
+    "favorite": "favorite",
+    "report": "report",
+    "reviews": "reviews",
+    "specialties": "Specialties",
+    "interests": "Interests",
+    "teachExp": "Teaching Experience",
+    "courseProfile": "Courses",
+    "more": "more",
+    "less": "less",
+    "booking": "Start Booking",
+    "pickDate": "Pick Date",
+    "pickClass": "Pick your Class",
+    "bookSuccess": "Booking Success!",
+    "bookFail": "Booking Failed",
+
+    "upcoming": "Upcoming Lesson",
+    "noUpcoming": "You have no upcoming lesson",
+    "timeLocale": "en",
+    "enterRoom": "Enter room now",
+    "totalTime": "Total lesson time is {total}",
+    "@totalTime": {
+        "placeholders": {
+            "total": {
+                "type": "String"
+            }
+        }
+    },
+    "welcome": "Welcome to LetTutor",
+    "lessonTime": "Lesson Time : ",
+    "remove": "Remove",
+    "removeSuccess": "Remove Success!",
+    "removeFail": "Cannot remove that Class",
+    "goMeet": "Go To Meeting",
+
+    "record": "Record",
+    "addRating": "Add a Rating",
+    "rating": "Rating: ",
+    "rateLessonTime": "Lesson Time",
+    "rateQuestion": "What is your rating for {name}",
+    "@rateQuestion": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "reportQuestion": "What was the reason you reported on the lesson?",
+    "addNote": "Additional Notes",
+    "later": "Later",
+    "submit": "Submit",
+    "reportSuccess": "Report Successfully!",
+    "rateSuccess": "Rating Successfully!",
+    "thankReport": "Thank you! Your report was sent.",
+    "thankRate": "Thank you for rating!",
+
+    "courseSearch": "Course...",
+    "overview": "Overview",
+    "why": "Why take this course",
+    "what": "What will you be able to do",
+    "expLevel": "Experience Level",
+    "courseLength": "Course Length",
+    "topics": "{number} topics",
+    "@topics": {
+        "placeholders": {
+            "number": {
+                "type": "int"
+            }
+        }
+    },
+    "listTopics": "List Topics",
+
+    "accountSetting": "Account Settings",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "country": "Country",
+    "birthday": "Date of Birth",
+    "myLevel": "My Level",
+    "learn": "Want to learn",
+    "save": "Save Changes",
+    "saveSuccess": "Save Successfully",
+    "saveFail": "Cannot Save Profile",
+
+    "settings": "Settings",
+    "mainSettings": "Main Settings",
+    "changePass": "Change Password",
+    "social": "Social",
+    "language": "Language",
+    "privacy": "Privacy and Security",
+    "otherSetting": "Other Settings",
+    "nightTheme": "Night Theme"
+}

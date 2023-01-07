@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
 import 'package:jitsi_meet/feature_flag/feature_flag.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 import '../../model/user_provider.dart';
@@ -29,6 +31,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     var userProvider = context.read<UserProvider>();
     String userId = widget.bookInfo.userId;
     String? tutorId = widget.bookInfo.scheduleDetailInfo?.scheduleInfo?.tutorId;
@@ -56,19 +59,19 @@ class _ScheduleCardState extends State<ScheduleCard> {
     }
     return Card(
       margin: const EdgeInsets.all(10),
-      color: Colors.grey[300],
+      color: isDark ? null : Colors.grey[300],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
               margin: const EdgeInsets.fromLTRB(10, 10, 10, 5),
               child: Text(
-                  DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+                  DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                 style:const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
           ),
           Container(
             margin: const EdgeInsets.all(5),
-            color: Colors.white,
+            color: isDark ? Colors.black54 : Colors.white,
             child: Row(
               children: [
                 Padding(
@@ -104,14 +107,14 @@ class _ScheduleCardState extends State<ScheduleCard> {
           Container(
             margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-            color: Colors.white,
+            color: isDark ? Colors.black54 : Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: <Widget>[
-                    const Text('Lesson Time : ',style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
+                    Text(AppLocalizations.of(context)!.lessonTime,style:const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
                     Text(
                       DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
@@ -151,6 +154,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
                 child: ElevatedButton(
                   onPressed: () async {
                     final scaffoldMess = ScaffoldMessenger.of(context);
+                    final appLocale = AppLocalizations.of(context);
                     final now = DateTime.now();
                     final start = DateTime.fromMillisecondsSinceEpoch(widget.bookInfo.scheduleDetailInfo!.startPeriodTimestamp);
                     if (start.isAfter(now) && now.difference(start).inHours.abs() >= 2) {
@@ -158,11 +162,13 @@ class _ScheduleCardState extends State<ScheduleCard> {
                       if (res) {
                         widget.reloadList();
                         final snackBar = SnackBar(
-                          content: const Text('Delete success!'),
-                          action: SnackBarAction(
-                            onPressed: () {
-                              // Some code to undo the change.
-                            }, label: 'done',
+                          elevation: 0,
+                          backgroundColor: Colors.transparent,
+                          behavior: SnackBarBehavior.floating,
+                          content: AwesomeSnackbarContent(
+                            title: appLocale!.removeSuccess,
+                            message: appLocale.removeSuccess,
+                            contentType: ContentType.success,
                           ),
                         );
 
@@ -172,18 +178,20 @@ class _ScheduleCardState extends State<ScheduleCard> {
                       }
                     } else {
                       final snackBar = SnackBar(
-                        content: const Text('Cannot delete that'),
-                        action: SnackBarAction(
-                          onPressed: () {
-                            // Some code to undo the change.
-                          }, label: 'done',
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        behavior: SnackBarBehavior.floating,
+                        content: AwesomeSnackbarContent(
+                          title: appLocale!.removeFail,
+                          message: appLocale.removeFail,
+                          contentType: ContentType.failure,
                         ),
                       );
                       scaffoldMess.showSnackBar(snackBar);
                     }
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text('Delete'),
+                  child: Text(AppLocalizations.of(context)!.remove),
                 ),
               ),
               Container(
@@ -205,7 +213,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
                     } catch (error) {
                       debugPrint("error: $error");
                     }
-                  }, child: const Text('Go To Meeting'))
+                  }, child: Text(AppLocalizations.of(context)!.goMeet))
               ),
             ],
           ),

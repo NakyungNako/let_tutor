@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:let_tutor/model/course/course.dart';
 import 'package:let_tutor/views/courses/course_detail/pdf_viewer.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CourseDetail extends StatelessWidget {
   const CourseDetail({Key? key, required this.course,}) : super(key: key);
@@ -90,24 +91,24 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
                     child: Row(
-                      children: const [
-                        Expanded(
+                      children: [
+                        const Expanded(
                             flex: 1,
                             child: Divider(
                               color: Colors.black54,
                             )
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 10,right: 10),
+                          padding: const EdgeInsets.only(left: 10,right: 10),
                           child: Text(
-                            'Overview',
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.overview,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                             flex: 5,
                             child: Divider(
                               color: Colors.black54,
@@ -117,16 +118,16 @@ class CourseDetail extends StatelessWidget {
                     ),
                   ),
                   Row(
-                    children: const [
-                      Icon(
+                    children: [
+                      const Icon(
                         Icons.help_outline,
                         color: Colors.deepOrangeAccent,
                       ),
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            'Why take this course',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.why,
+                          style: const TextStyle(
                             fontSize: 18,
                           ),
                         ),
@@ -144,16 +145,16 @@ class CourseDetail extends StatelessWidget {
                     ),
                   ),
                   Row(
-                    children: const [
-                      Icon(
+                    children: [
+                      const Icon(
                         Icons.help_outline,
                         color: Colors.deepOrangeAccent,
                       ),
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            'What will you be able to do',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.what,
+                          style: const TextStyle(
                             fontSize: 18,
                           ),
                         ),
@@ -173,24 +174,24 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
                     child: Row(
-                      children: const [
-                        Expanded(
+                      children: [
+                        const Expanded(
                             flex: 1,
                             child: Divider(
                               color: Colors.black54,
                             )
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 10,right: 10),
+                          padding: const EdgeInsets.only(left: 10,right: 10),
                           child: Text(
-                            'Experience Level',
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.expLevel,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                             flex: 5,
                             child: Divider(
                               color: Colors.black54,
@@ -219,24 +220,24 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 15, 5, 15),
                     child: Row(
-                      children: const [
-                        Expanded(
+                      children: [
+                        const Expanded(
                             flex: 1,
                             child: Divider(
                               color: Colors.black54,
                             )
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 10,right: 10),
+                          padding: const EdgeInsets.only(left: 10,right: 10),
                           child: Text(
-                            'Course Length',
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.courseLength,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                             flex: 5,
                             child: Divider(
                               color: Colors.black54,
@@ -254,7 +255,7 @@ class CourseDetail extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
-                            '${course.topics.length} topics',
+                          AppLocalizations.of(context)!.topics(course.topics.length),
                           style: const TextStyle(
                             fontSize: 18,
                           ),
@@ -265,24 +266,24 @@ class CourseDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 15, 5, 0),
                     child: Row(
-                      children: const [
-                        Expanded(
+                      children: [
+                        const Expanded(
                             flex: 1,
                             child: Divider(
                               color: Colors.black54,
                             )
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 10,right: 10),
+                          padding: const EdgeInsets.only(left: 10,right: 10),
                           child: Text(
-                            'List Topics',
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.listTopics,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                             flex: 5,
                             child: Divider(
                               color: Colors.black54,

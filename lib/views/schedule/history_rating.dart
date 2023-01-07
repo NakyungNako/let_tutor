@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 import '../../model/schedule/book_info.dart';
@@ -51,6 +52,7 @@ class _HistoryRatingState extends State<HistoryRating> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return AlertDialog(
       content: SingleChildScrollView(
         child: Column(
@@ -65,12 +67,12 @@ class _HistoryRatingState extends State<HistoryRating> {
               style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10,),
-            const Text("Lesson Time", style: TextStyle(fontSize: 14)),
+            Text(AppLocalizations.of(context)!.rateLessonTime, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(DateFormat.yMMMEd().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+                Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                   style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
                 ),
                 const Text(", ", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
@@ -91,7 +93,7 @@ class _HistoryRatingState extends State<HistoryRating> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('What is your rating for ${widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name}?',
+              child: Text(AppLocalizations.of(context)!.rateQuestion(widget.historyInfo.scheduleDetailInfo!.scheduleInfo!.tutorInfo.name),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)
               ),
             ),
@@ -118,9 +120,9 @@ class _HistoryRatingState extends State<HistoryRating> {
                 controller: textarea,
                 keyboardType: TextInputType.text,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                    hintText: "Additional Notes",
-                    border: OutlineInputBorder(
+                decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.addNote,
+                    border: const OutlineInputBorder(
                         borderSide: BorderSide(width: 1)
                     )
                 ),
@@ -132,20 +134,16 @@ class _HistoryRatingState extends State<HistoryRating> {
       actions: [
         TextButton(onPressed: (){
           Navigator.pop(context);
-        }, child: const Text('Later',style: TextStyle(color: Colors.black),)),
+        }, child: Text(AppLocalizations.of(context)!.later,style: TextStyle(color: isDark ? Colors.white : Colors.black),)),
         TextButton(onPressed: () {
           submitRating(textarea.text, widget.historyInfo.userId, widget.historyInfo.id, rateValue);
           Navigator.pop(context);
           showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: const Text('Report Successfully!'),
-              content: const Text('Thank you! Your report was sent.', style: TextStyle(fontSize: 19),),
+              title: Text(AppLocalizations.of(context)!.rateSuccess),
+              content: Text(AppLocalizations.of(context)!.thankRate, style:const TextStyle(fontSize: 19),),
               actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel'),
-                ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
                   child: const Text('OK'),
@@ -153,7 +151,7 @@ class _HistoryRatingState extends State<HistoryRating> {
               ],
             ),
           );
-        }, child: const Text('Submit'))
+        }, child: Text(AppLocalizations.of(context)!.submit))
       ],
     );
   }

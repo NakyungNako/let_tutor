@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/theme/theme_manager.dart';
 import 'package:let_tutor/views/schedule/history.dart';
 import 'package:provider/provider.dart';
 import 'package:let_tutor/views/configure/account.dart';
@@ -7,9 +8,13 @@ import 'package:let_tutor/views/courses/courses.dart';
 import 'package:let_tutor/views/messages/messages.dart';
 import 'package:let_tutor/views/schedule/schedules.dart';
 import 'package:let_tutor/views/tutor/tutor.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key, required this.setLocale, required this.themeManager}) : super(key: key);
+
+  final void Function(Locale locale) setLocale;
+  final ThemeManager themeManager;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -31,13 +36,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       currentIndex = index;
       if(currentIndex == 0){
-        page = 'Find a Tutor';
+        page = AppLocalizations.of(context)!.findTutor;
       } else if (currentIndex == 1) {
-        page = 'Schedule';
+        page = AppLocalizations.of(context)!.schedule;
       } else if (currentIndex == 2) {
-        page = 'History';
+        page = AppLocalizations.of(context)!.history;
       } else if (currentIndex == 3) {
-        page = 'Discover Courses';
+        page = AppLocalizations.of(context)!.discover;
       } else {
         page = 'App';
       }
@@ -56,8 +61,6 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(page),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
         ),
         drawer: Drawer(
           child: ListView(
@@ -78,29 +81,29 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(builder: (context) => const Account()));
                 },
-                child: const ListTile(
-                  leading: Icon(Icons.account_circle),
-                  title: Text('Profile'),
+                child: ListTile(
+                  leading: const Icon(Icons.account_circle),
+                  title: Text(AppLocalizations.of(context)!.profile),
                 ),
               ),
               InkWell(
                 onTap: (){
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Settings()));
+                      MaterialPageRoute(builder: (context) => Settings(setLocale: widget.setLocale, themeManager: widget.themeManager,)));
                 },
-                child: const ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('Settings'),
+                child: ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: Text(AppLocalizations.of(context)!.settings),
                 ),
               ),
               InkWell(
                 onTap: (){
                   Navigator.popUntil(context, ModalRoute.withName('/login'));
                 },
-                child: const ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Log out'),
+                child: ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: Text(AppLocalizations.of(context)!.logOut),
                 ),
               ),
             ],
@@ -110,15 +113,12 @@ class _HomePageState extends State<HomePage> {
         bottomNavigationBar: BottomNavigationBar(
           onTap: onTap,
           currentIndex: currentIndex,
-          selectedItemColor: Colors.black54,
-          unselectedItemColor: Colors.grey.withOpacity(0.5),
-          elevation: 0,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Tutor'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: 'Schedule'),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-            BottomNavigationBarItem(icon: Icon(Icons.my_library_books), label: 'Courses'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: const Icon(Icons.school), label: AppLocalizations.of(context)!.tutor),
+            BottomNavigationBarItem(icon: const Icon(Icons.calendar_today_rounded), label: AppLocalizations.of(context)!.schedule),
+            BottomNavigationBarItem(icon: const Icon(Icons.history), label: AppLocalizations.of(context)!.history),
+            BottomNavigationBarItem(icon: const Icon(Icons.my_library_books), label: AppLocalizations.of(context)!.courses),
+            // BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,6 +24,7 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   Future<void> loginPressed() async {
     final scaffoldMess = ScaffoldMessenger.of(context);
+    final appLocale = AppLocalizations.of(context);
     var response = await http.post(
         Uri.parse('$url/user/forgotPassword'),
         body: jsonEncode({'email': email}),
@@ -31,12 +32,26 @@ class _ResetPasswordState extends State<ResetPassword> {
     );
 
     if(response.statusCode == 200) {
+      final snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        content: Text(appLocale!.registerSuccess),
+        action: SnackBarAction(
+          textColor: Colors.white,
+          onPressed: () {
+            // Some code to undo the change.
+          }, label: 'close',
+        ),
+      );
+      scaffoldMess.showSnackBar(snackBar);
       if (!mounted) return;
       Navigator.pop(context);
     } else {
       final snackBar = SnackBar(
+        elevation: 0,
         backgroundColor: Colors.red,
-        content: const Text('Something goes wrong! Try again'),
+        behavior: SnackBarBehavior.floating,
+        content: Text(appLocale!.registerFail),
         action: SnackBarAction(
           textColor: Colors.white,
           onPressed: () {
@@ -61,23 +76,21 @@ class _ResetPasswordState extends State<ResetPassword> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text('Password Reset'),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          title: Text(AppLocalizations.of(context)!.resetTitle),
         ),
         body: Container(
           margin: const EdgeInsets.only(left: 15, right: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Reset Password',
-                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25),
+              Text(
+                AppLocalizations.of(context)!.resetPass,
+                style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 25),
               ),
               const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Please enter your email address to reset your account.'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(AppLocalizations.of(context)!.resetQuote),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -88,7 +101,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                   keyboardType: TextInputType.emailAddress,
                   onChanged: onEmailChanged,
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                       hintText: "example@mail.com",
                   ),
                 ),
@@ -101,7 +113,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50)
                   ),
-                  child: const Text('Send Reset Link'),
+                  child: Text(AppLocalizations.of(context)!.resetSend),
                 ),
               ),
             ],

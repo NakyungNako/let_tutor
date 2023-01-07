@@ -11,7 +11,7 @@ Feedback _$FeedbackFromJson(Map<String, dynamic> json) => Feedback(
       json['bookingId'] as String,
       json['firstId'] as String,
       json['secondId'] as String,
-      json['rating'] as int,
+      (json['rating'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$FeedbackToJson(Feedback instance) => <String, dynamic>{

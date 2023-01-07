@@ -6,6 +6,7 @@ import 'package:let_tutor/model/tutor/tutor_search.dart';
 import 'package:let_tutor/views/tutor/tutor_detail/tutor_detail.dart';
 import 'package:let_tutor/widgets/avatar.dart';
 import 'package:let_tutor/widgets/stars.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 class TutorCard extends StatefulWidget {
@@ -76,14 +77,23 @@ class _TutorCardState extends State<TutorCard> {
         .where((element) => widget.tutor.specialties.split(",").contains(element.key))
         .map((e) => e.value)
         .toList();
+    if(specialList.indexWhere((element) => element == "English for Kids") != -1) {
+      specialList[specialList.indexWhere((element) => element == "English for Kids")] = AppLocalizations.of(context)!.englishKids;
+    }
+    if(specialList.indexWhere((element) => element == "English for Business") != -1) {
+      specialList[specialList.indexWhere((element) => element == "English for Business")] = AppLocalizations.of(context)!.englishBusiness;
+    }
+    if(specialList.indexWhere((element) => element == "Conversational English") != -1) {
+      specialList[specialList.indexWhere((element) => element == "Conversational English")] = AppLocalizations.of(context)!.englishConversation;
+    }
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Card(
         elevation: 10,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Colors.white70, width: 1),
-          borderRadius: BorderRadius.circular(6),
-        ),
+        // shape: RoundedRectangleBorder(
+        //   side: const BorderSide(color: Colors.white70, width: 1),
+        //   borderRadius: BorderRadius.circular(6),
+        // ),
         child: InkWell(
           onTap: () {
             // Navigator.pushNamed(context, '/tutordetail',

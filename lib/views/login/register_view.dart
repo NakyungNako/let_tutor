@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:let_tutor/widgets/input_text.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -47,6 +48,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   Future<void> registerUser() async {
     final scaffoldMess = ScaffoldMessenger.of(context);
+    final appLocale = AppLocalizations.of(context);
     final response = await http.post(Uri.parse("$url/auth/register"), body: {
       'email': email,
       'password': password,
@@ -55,7 +57,9 @@ class _RegisterViewState extends State<RegisterView> {
 
     if (response.statusCode == 201) {
       final snackBar = SnackBar(
-        content: const Text('Registed Success!'),
+        elevation: 0,
+        content: Text(appLocale!.registerSuccess),
+        behavior: SnackBarBehavior.floating,
         action: SnackBarAction(
           onPressed: () {
             // Some code to undo the change.
@@ -67,13 +71,15 @@ class _RegisterViewState extends State<RegisterView> {
       Navigator.pop(context);
     } else {
       final snackBar = SnackBar(
-        content: const Text('Something wrong! Please try again'),
+        elevation: 0,
+        content: Text(appLocale!.registerFail),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
         action: SnackBarAction(
           onPressed: () {
             // Some code to undo the change.
           }, label: 'done',
         ),
-        backgroundColor: Colors.red[300],
       );
       scaffoldMess.showSnackBar(snackBar);
       throw Exception('Cannot registed');
@@ -91,9 +97,7 @@ class _RegisterViewState extends State<RegisterView> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Register'),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          title: Text(AppLocalizations.of(context)!.register),
         ),
         body: Container(
           margin: const EdgeInsets.only(left: 15, right: 15),
@@ -111,7 +115,7 @@ class _RegisterViewState extends State<RegisterView> {
                         children: [
                           Text(
                             "Email:",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.grey[800]),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                           ),
                           const SizedBox(
                             height: 10,
@@ -124,15 +128,14 @@ class _RegisterViewState extends State<RegisterView> {
                             validator: (value) {
                               bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!);
                               if(value.isEmpty){
-                                return "Enter Email!";
+                                return AppLocalizations.of(context)!.enterEmail;
                               }
                               if(!emailValid) {
-                                return "Enter Valid Email";
+                                return AppLocalizations.of(context)!.enterValidEmail;
                               }
                               return null;
                             },
                             decoration: const InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                                 hintText: "enter your email: example@mail.com"),
                           )
                         ],
@@ -144,8 +147,8 @@ class _RegisterViewState extends State<RegisterView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Password:",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.grey[800]),
+                            AppLocalizations.of(context)!.password,
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                           ),
                           const SizedBox(
                             height: 10,
@@ -157,13 +160,12 @@ class _RegisterViewState extends State<RegisterView> {
                             onChanged: onPasswordChanged,
                             validator: (value) {
                               if(value!.isEmpty){
-                                return "Enter Password!";
+                                return AppLocalizations.of(context)!.enterPass;
                               } else if (value.length < 8){
-                                return "Password Length must be 8 or more";
+                                return AppLocalizations.of(context)!.shortPass;
                               }
                             },
                             decoration: InputDecoration(
-                                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                                 hintText: "enter your pass",
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -186,8 +188,8 @@ class _RegisterViewState extends State<RegisterView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Re-Enter Password:",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.grey[800]),
+                            AppLocalizations.of(context)!.rePassword,
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                           ),
                           const SizedBox(
                             height: 10,
@@ -199,13 +201,12 @@ class _RegisterViewState extends State<RegisterView> {
                             onChanged: onPasswordChanged,
                             validator: (value) {
                               if(value!.isEmpty){
-                                return "Enter Password!";
+                                return AppLocalizations.of(context)!.enterPass;
                               } else if (value != _password.text){
-                                return "Password mismatch";
+                                return AppLocalizations.of(context)!.matchPass;
                               }
                             },
                             decoration: InputDecoration(
-                                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                                 hintText: "enter your pass",
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -234,15 +235,15 @@ class _RegisterViewState extends State<RegisterView> {
                         style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(50)
                         ),
-                        child: const Text('Register'),
+                        child: Text(AppLocalizations.of(context)!.register),
                       ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Already have an account?'),
+                        Text(AppLocalizations.of(context)!.alreadyMember),
                         TextButton(
-                          child: const Text('Log in'),
+                          child: Text(AppLocalizations.of(context)!.backToLogin),
                           onPressed: () {
                             Navigator.pop(context);
                           },
