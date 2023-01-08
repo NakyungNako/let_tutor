@@ -22,7 +22,7 @@ class HistoryRating extends StatefulWidget {
 class _HistoryRatingState extends State<HistoryRating> {
   static const String url = 'https://sandbox.api.lettutor.com';
   bool isChecked = false;
-  int rateValue = 0;
+  int rateValue = 3;
   TextEditingController textarea = TextEditingController();
 
   Future<void> submitRating(String content, String userId, String bookingId, int rating) async {
@@ -69,13 +69,12 @@ class _HistoryRatingState extends State<HistoryRating> {
             const SizedBox(height: 10,),
             Text(AppLocalizations.of(context)!.rateLessonTime, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 10,),
+            Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+              style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
-                  style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
-                ),
-                const Text(", ", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
                 Text(
                   DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
@@ -137,7 +136,7 @@ class _HistoryRatingState extends State<HistoryRating> {
         }, child: Text(AppLocalizations.of(context)!.later,style: TextStyle(color: isDark ? Colors.white : Colors.black),)),
         TextButton(onPressed: () {
           submitRating(textarea.text, widget.historyInfo.userId, widget.historyInfo.id, rateValue);
-          Navigator.pop(context);
+          Navigator.pop(context, rateValue.toDouble());
           showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(

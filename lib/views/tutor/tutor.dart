@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +45,7 @@ class _TutorPageState extends State<TutorPage> {
   List<TutorSearch> _results = [];
   List<TutorSearch> _searchedTutor = [];
   String specialty = "all";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -122,11 +124,18 @@ class _TutorPageState extends State<TutorPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme _textTheme = Theme.of(context).textTheme;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     var specialtiesList = {...Specialties.specialList};
     specialtiesList.update("english-for-kids", (value) => AppLocalizations.of(context)!.englishKids);
     specialtiesList.update("business-english", (value) => AppLocalizations.of(context)!.englishBusiness);
     specialtiesList.update("conversational-english", (value) => AppLocalizations.of(context)!.englishConversation);
     List<MapEntry<String, String>> specialList = specialtiesList.entries.toList();
+    if(_results.isNotEmpty && isLoading == true){
+      setState(() {
+        isLoading = false;
+      });
+    }
     return Container(
         padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
         child: Column(
@@ -229,8 +238,8 @@ class _TutorPageState extends State<TutorPage> {
                 shrinkWrap: true,
               ),
             ),
-            Expanded(
-              child: ListView.builder(
+            isLoading == false ? Expanded(
+              child: _results.isNotEmpty ? ListView.builder(
                 controller: _scrollController,
                 itemCount: _results.length,
                 itemBuilder: (context,index) {
@@ -238,8 +247,8 @@ class _TutorPageState extends State<TutorPage> {
                 },
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
-              ),
-            ),
+              ) : SvgPicture.asset('assets/svg/no-records.svg',width: 500,),
+            ) : const Center(child: CircularProgressIndicator()),
           ],
         ),
       );

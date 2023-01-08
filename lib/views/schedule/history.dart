@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:let_tutor/views/schedule/history_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -19,6 +20,8 @@ class _HistoryLessonState extends State<HistoryLesson> {
   static const String url = 'https://sandbox.api.lettutor.com';
   List<BookingInfo> historyInfo = [];
   List<LessonReport> reportReason = [];
+  bool isLoading = true;
+  bool isHistoryList = true;
 
   @override
   void initState() {
@@ -69,6 +72,7 @@ class _HistoryLessonState extends State<HistoryLesson> {
       final historyList = jsonRes['data']['rows'] as List;
       setState(() {
         historyInfo = historyList.map((schedule) => BookingInfo.fromJson(schedule)).toList();
+        isLoading = false;
       });
     } else {
       throw Exception('Failed to load upcomming lesson');
@@ -77,13 +81,30 @@ class _HistoryLessonState extends State<HistoryLesson> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    if(historyInfo.isEmpty){
+      setState(() {
+        isHistoryList = false;
+      });
+    }
+    TextTheme _textTheme = Theme.of(context).textTheme;
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return isLoading ? const Center(child: CircularProgressIndicator()) : isHistoryList ? ListView.builder(
         physics: const BouncingScrollPhysics(),
         itemCount: historyInfo.length,
         shrinkWrap: true,
         itemBuilder: (BuildContext context, int index) {
           return HistoryCard(historyInfo: historyInfo[index], reasons: reportReason,);
         },
+    ) : Center(
+      child: Column(
+        children: [
+          SvgPicture.asset('assets/svg/empty-box.svg'),
+          Text("You have learnt nothing",
+            style: _textTheme.headlineSmall?.copyWith(
+              color:isDark?Colors.white: Colors.orange,fontWeight: FontWeight.bold
+          ),)
+        ],
+      ),
     );
   }
 }

@@ -54,7 +54,9 @@ class _MyAppState extends State<MyApp> {
   initTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final isDark = prefs.getBool("isDark");
-    _themeManager.toggleTheme(isDark!);
+    if(isDark != null){
+      _themeManager.toggleTheme(isDark);
+    }
   }
 
   themeListener(){

@@ -28,10 +28,11 @@ class _LoginViewState extends State<LoginView> {
   bool passToggle = true;
   bool isLoading = false;
   bool isWrong = false;
+  bool isChecked = false;
 
   @override
   void initState() {
-    // getSharedPreferences();
+    getSharedPreferences();
     super.initState();
   }
 
@@ -39,13 +40,23 @@ class _LoginViewState extends State<LoginView> {
     final prefs = await SharedPreferences.getInstance();
     final storedEmail = prefs.getString('email');
     final storedPass = prefs.getString('password');
+    final storedCheck = prefs.getBool("remember_me");
 
     setState(() {
       _email = TextEditingController(text: storedEmail);
       _password = TextEditingController(text: storedPass);
-      email = storedEmail!;
-      password = storedPass!;
+      if(storedEmail != null){
+        email = storedEmail;
+      }
+      if(storedPass != null){
+        password = storedPass;
+      }
+      if(storedCheck != null){
+        isChecked = storedCheck;
+      }
     });
+    await prefs.remove('email');
+    await prefs.remove('password');
   }
 
   @override
@@ -67,10 +78,18 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
+  void handleRemember(bool? value){
+    setState(() {
+      isChecked = value!;
+    });
+  }
+
   Future<void> loginPressed(UserProvider userProvider) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('email', email);
-    prefs.setString('password', password);
+    if(isChecked == true){
+      prefs.setString('email', email);
+      prefs.setString('password', password);
+    }
     setState(() {
       isLoading = true;
     });
@@ -257,6 +276,19 @@ class _LoginViewState extends State<LoginView> {
                           child: Text(AppLocalizations.of(context)!.forgotPassword),
                         ),
                       ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                        SizedBox(
+                            height: 24.0,
+                            width: 24.0,
+                            child: Checkbox(
+                                value: isChecked,
+                                onChanged: handleRemember)),
+                        const SizedBox(width: 10.0),
+                        Text("Remember Me",)
+                      ]),
                     ),
                     isLoading ? const CircularProgressIndicator() : Container(),
                     isWrong ? Padding(

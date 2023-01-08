@@ -79,13 +79,12 @@ class _HistoryReportState extends State<HistoryReport> {
             const SizedBox(height: 10,),
             Text(AppLocalizations.of(context)!.rateLessonTime, style:const TextStyle(fontSize: 14)),
             const SizedBox(height: 10,),
+            Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
+              style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(DateFormat.yMMMEd(AppLocalizations.of(context)!.timeLocale).format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
-                  style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),
-                ),
-                const Text(", ", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
                 Text(
                   DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(widget.historyInfo.scheduleDetailInfo!.startPeriodTimestamp)),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),

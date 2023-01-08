@@ -21,7 +21,6 @@ class CourseDetail extends StatelessWidget {
       "7": "Proficiency"
     };
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -94,9 +93,7 @@ class CourseDetail extends StatelessWidget {
                       children: [
                         const Expanded(
                             flex: 1,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10,right: 10),
@@ -110,9 +107,7 @@ class CourseDetail extends StatelessWidget {
                         ),
                         const Expanded(
                             flex: 5,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                       ],
                     ),
@@ -177,9 +172,7 @@ class CourseDetail extends StatelessWidget {
                       children: [
                         const Expanded(
                             flex: 1,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10,right: 10),
@@ -193,9 +186,7 @@ class CourseDetail extends StatelessWidget {
                         ),
                         const Expanded(
                             flex: 5,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                       ],
                     ),
@@ -223,9 +214,7 @@ class CourseDetail extends StatelessWidget {
                       children: [
                         const Expanded(
                             flex: 1,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10,right: 10),
@@ -239,9 +228,7 @@ class CourseDetail extends StatelessWidget {
                         ),
                         const Expanded(
                             flex: 5,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                       ],
                     ),
@@ -269,9 +256,7 @@ class CourseDetail extends StatelessWidget {
                       children: [
                         const Expanded(
                             flex: 1,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10,right: 10),
@@ -285,9 +270,7 @@ class CourseDetail extends StatelessWidget {
                         ),
                         const Expanded(
                             flex: 5,
-                            child: Divider(
-                              color: Colors.black54,
-                            )
+                            child: Divider()
                         ),
                       ],
                     ),

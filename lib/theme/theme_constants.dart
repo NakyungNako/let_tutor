@@ -12,6 +12,10 @@ ThemeData lightTheme = ThemeData(
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: Colors.orange[800],
     ),
+    dividerColor: Colors.black54,
+    checkboxTheme: CheckboxThemeData(
+      fillColor: MaterialStateProperty.all<Color>(COLOR_ACCENT)
+    ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       selectedItemColor: Colors.black54,
       unselectedItemColor: Colors.grey.withOpacity(0.5),
@@ -55,6 +59,7 @@ ThemeData darkTheme = ThemeData(
   progressIndicatorTheme: ProgressIndicatorThemeData(
     color: Colors.orange[800],
   ),
+  dividerColor: Colors.white70,
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     selectedItemColor: Colors.white70,
     unselectedItemColor: Colors.grey.withOpacity(0.5),

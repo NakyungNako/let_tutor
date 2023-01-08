@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:jitsi_meet/feature_flag/feature_flag.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
@@ -30,6 +31,8 @@ class _SchedulesState extends State<Schedules> {
   BookingInfo? upcomingLesson;
   List<BookingInfo> bookInfo = [];
   bool isLoading = true;
+  bool isLoadSchedule = true;
+  bool isSchedule = false;
   static const String url = 'https://sandbox.api.lettutor.com';
 
   @override
@@ -110,6 +113,10 @@ class _SchedulesState extends State<Schedules> {
       final bookList = jsonRes['data']['rows'] as List;
       setState(() {
         bookInfo = bookList.map((schedule) => BookingInfo.fromJson(schedule)).toList();
+        isLoadSchedule = false;
+        if(bookList.isNotEmpty){
+          isSchedule = true;
+        }
       });
     } else {
       throw Exception('Failed to load upcomming lesson');
@@ -242,8 +249,8 @@ class _SchedulesState extends State<Schedules> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
+        isLoadSchedule ? Container(height: 20, child: CircularProgressIndicator(),) : Expanded(
+          child: isSchedule ? ListView.builder(
             physics: const BouncingScrollPhysics(),
             itemCount: bookInfo.length,
             shrinkWrap: true,
@@ -254,7 +261,7 @@ class _SchedulesState extends State<Schedules> {
                 getUpcoming();
               },);
             },
-          ),
+          ) : SvgPicture.asset('assets/svg/empty-box.svg'),
         )
       ],
     );

@@ -21,14 +21,14 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
-  double rating = 0;
+  double rating = -1;
 
   Future openReportDialog() => showDialog(
       context: context,
       builder: (context) => HistoryReport(historyInfo: widget.historyInfo, reasons: widget.reasons,)
   );
 
-  Future openRatingDialog() => showDialog(
+  Future<double?> openRatingDialog() => showDialog<double>(
       context: context,
       builder: (context) => HistoryRating(historyInfo: widget.historyInfo,)
   );
@@ -127,8 +127,13 @@ class _HistoryCardState extends State<HistoryCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    rating == 0 ? TextButton(onPressed: (){
-                      openRatingDialog();
+                    rating == -1 ? TextButton(onPressed: () async {
+                      var refresh = await openRatingDialog();
+                      if(refresh != null){
+                        setState(() {
+                          rating = refresh;
+                        });
+                      }
                     },
                         child: Text(AppLocalizations.of(context)!.addRating))
                     : Row(
