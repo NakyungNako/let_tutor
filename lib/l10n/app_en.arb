@@ -19,6 +19,7 @@
     "resetPass": "Reset Password",
     "resetQuote": "Please enter your email address to reset your account.",
     "resetSend": "Send Reset Link",
+    "rememberMe": "Remember Me",
 
     "password": "Password:",
     "rePassword": "Re-enter Password:",

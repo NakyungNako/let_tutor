@@ -73,6 +73,9 @@ class _HistoryLessonState extends State<HistoryLesson> {
       setState(() {
         historyInfo = historyList.map((schedule) => BookingInfo.fromJson(schedule)).toList();
         isLoading = false;
+        if(historyList.isEmpty){
+          isHistoryList = false;
+        }
       });
     } else {
       throw Exception('Failed to load upcomming lesson');
@@ -81,11 +84,6 @@ class _HistoryLessonState extends State<HistoryLesson> {
 
   @override
   Widget build(BuildContext context) {
-    if(historyInfo.isEmpty){
-      setState(() {
-        isHistoryList = false;
-      });
-    }
     TextTheme _textTheme = Theme.of(context).textTheme;
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     return isLoading ? const Center(child: CircularProgressIndicator()) : isHistoryList ? ListView.builder(

@@ -287,7 +287,7 @@ class _LoginViewState extends State<LoginView> {
                                 value: isChecked,
                                 onChanged: handleRemember)),
                         const SizedBox(width: 10.0),
-                        Text("Remember Me",)
+                        Text(AppLocalizations.of(context)!.rememberMe,)
                       ]),
                     ),
                     isLoading ? const CircularProgressIndicator() : Container(),
@@ -302,7 +302,7 @@ class _LoginViewState extends State<LoginView> {
                             border: Border.all(color: Colors.redAccent),
                           borderRadius: BorderRadius.circular(3)
                         ),
-                        child: Text(AppLocalizations.of(context)!.wrongUser),
+                        child: Text(AppLocalizations.of(context)!.wrongUser, style: const TextStyle(color: Colors.black),),
                       ),
                     ) : Container(),
                     Padding(

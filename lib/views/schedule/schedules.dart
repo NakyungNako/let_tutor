@@ -249,7 +249,7 @@ class _SchedulesState extends State<Schedules> {
             ],
           ),
         ),
-        isLoadSchedule ? Container(height: 20, child: CircularProgressIndicator(),) : Expanded(
+        isLoadSchedule ? Center(child: CircularProgressIndicator(),) : Expanded(
           child: isSchedule ? ListView.builder(
             physics: const BouncingScrollPhysics(),
             itemCount: bookInfo.length,
